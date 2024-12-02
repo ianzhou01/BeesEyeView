@@ -14,10 +14,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(rapidjson)
 
 add_executable(AirBnB
-    BeesEyeView/main.cpp
-    BeesEyeView/dev.cpp
-    BeesEyeView/timsort.cpp
-    BeesEyeView/introsort.cpp
+    main.cpp
+    dev.cpp
+    timsort.cpp
+    introsort.cpp
 )
 
 target_include_directories(AirBnB PRIVATE ${rapidjson_SOURCE_DIR}/include)
