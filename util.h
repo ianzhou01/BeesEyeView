@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <cmath>
 #include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/document.h"
@@ -35,5 +36,5 @@ struct Listing {
     double distance = nanf(""); //sets this value to NaN until we initialize it
 };
 
-bool getAvailableListings(vector<Listing>& listings, const string& json);
+bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName);
 

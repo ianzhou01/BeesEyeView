@@ -1,6 +1,19 @@
 #include "util.h"
 
-bool getAvailableListings(vector<Listing>& listings, const int maxPrice, const string& json)  {
+bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName)  {
+    ifstream file(fileName);
+    if (!file.is_open()){
+        cerr << "Error opening file: " << fileName << endl;
+        return false;
+    }
+
+    // Read file into string
+    stringstream buffer;
+    buffer << file.rdbuf();
+    string json = buffer.str();
+    file.close();
+
+    // Parse entire Json file
     Document doc;
     doc.Parse(json.c_str());
 
@@ -28,8 +41,20 @@ bool getAvailableListings(vector<Listing>& listings, const int maxPrice, const s
                 available_listing.price = listing["column_10"].GetInt();
                 available_listing.minimum_nights = listing["minimum_nights"].GetInt();
                 available_listing.num_reviews = listing["number_of_reviews"].GetInt();
-                available_listing.last_review_date = listing["last_review"].GetString();
-                available_listing.reviews_per_month = listing["reviews_per_month"].GetFloat();
+
+                // These two fields are potentially null
+                if (listing.HasMember("last_review") && listing["last_review"].IsString()) {
+                    available_listing.last_review_date = listing["last_review"].GetString();
+                } else {
+                    available_listing.last_review_date = "N/A";
+                }
+                if (listing.HasMember("reviews_per_month") && listing["reviews_per_month"].IsString()) {
+                    available_listing.reviews_per_month = listing["reviews_per_month"].GetFloat();
+                } else {
+                    available_listing.reviews_per_month = nanf(""); // Can change
+                }
+
+
                 available_listing.calculated_host_listings_count = listing["calculated_host_listings_count"].GetInt();
                 available_listing.availability = listing["availability_365"].GetInt();
                 available_listing.updated_date = listing["updated_date"].GetString();
@@ -37,9 +62,8 @@ bool getAvailableListings(vector<Listing>& listings, const int maxPrice, const s
                 available_listing.country = listing["column_19"].GetString();
 
                 // This can potentially be optimized:
-                const Value& coords = listing["coordinates"].GetArray();
-                available_listing.coord_lon = coords["lon"].GetDouble();
-                available_listing.coord_lat = coords["lat"].GetDouble();
+                available_listing.coord_lon = listing["coordinates"]["lon"].GetDouble();
+                available_listing.coord_lat = listing["coordinates"]["lat"].GetDouble();
 
                 // Add to the result vector
                 listings.push_back(available_listing);

@@ -19,8 +19,18 @@ int main(){
     std::cout << "------------------------------------------------" << std::endl;
 
     // TODO:
+    cout << "Test input run: \n";
+    const int max_price = 211;
+    vector<Listing> listings;
 
+    getListingsByPrice(listings, max_price, "data/air-bnb-sample.json");
 
+    for (const auto &listing : listings) {
+        cout << "Listing " << listing.name << endl;
+        cout << "Price: " << listing.price << endl;
+        cout << "Days available: " << listing.availability << endl;
+        cout << "Coords: (" << listing.coord_lon << ", " << listing.coord_lat << ")\n\n";
+    }
 
     // do some sort of user interface to ask for parameters
     //
