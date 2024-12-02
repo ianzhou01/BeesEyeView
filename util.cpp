@@ -1,5 +1,9 @@
 #include "util.h"
 
+bool Listing::operator<(const Listing &other) const {
+    return (this->distance < other.distance);
+}
+
 bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName)  {
     ifstream file(fileName);
     if (!file.is_open()){

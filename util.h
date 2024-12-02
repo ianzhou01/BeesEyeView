@@ -36,6 +36,8 @@ struct Listing {
 
     //custom field for our own purposes
     double distance = nanf(""); //sets this value to NaN until we initialize it
+
+    bool operator<(const Listing& other) const;
 };
 
 bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName);
