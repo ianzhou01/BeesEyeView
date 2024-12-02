@@ -23,7 +23,9 @@ int main(){
     const int max_price = 211;
     vector<Listing> listings;
 
-    getListingsByPrice(listings, max_price, "data/air-bnb-sample.json");
+    if (!getListingsByPrice(listings, max_price, "data/air-bnb-sample.json")) {
+        return -1;
+    }
 
     for (const auto &listing : listings) {
         cout << "Listing " << listing.name << endl;

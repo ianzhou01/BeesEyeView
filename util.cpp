@@ -19,7 +19,7 @@ bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const str
 
     // Check if JSON is valid
     if (doc.HasParseError()) {
-        cerr << "Error parsing JSON!" << endl;
+        cerr << "Invalid JSON file!" << endl;
         return false;
     }
 
@@ -54,14 +54,11 @@ bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const str
                     available_listing.reviews_per_month = nanf(""); // Can change
                 }
 
-
                 available_listing.calculated_host_listings_count = listing["calculated_host_listings_count"].GetInt();
                 available_listing.availability = listing["availability_365"].GetInt();
                 available_listing.updated_date = listing["updated_date"].GetString();
                 available_listing.city = listing["city"].GetString();
                 available_listing.country = listing["column_19"].GetString();
-
-                // This can potentially be optimized:
                 available_listing.coord_lon = listing["coordinates"]["lon"].GetDouble();
                 available_listing.coord_lat = listing["coordinates"]["lat"].GetDouble();
 
