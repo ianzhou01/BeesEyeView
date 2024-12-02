@@ -19,17 +19,22 @@ int main(){
     std::cout << "------------------------------------------------" << std::endl;
 
     // TODO:
-    cout << "Test input run: \n";
-    const int max_price = 211;
+    cout << "Enter your maximum room rate: $";
+    int max_price;
+    cin >> max_price;
     vector<Listing> listings;
 
     if (!getListingsByPrice(listings, max_price, "data/air-bnb-sample.json")) {
         return -1;
     }
+    if (listings.empty()) {
+        cout << "No listings found. :(\n";
+        return 0;
+    }
 
     for (const auto &listing : listings) {
-        cout << "Listing " << listing.name << endl;
-        cout << "Price: " << listing.price << endl;
+        cout << "Name: " << listing.name << endl;
+        cout << "Rate: $" << listing.price << endl;
         cout << "Days available: " << listing.availability << endl;
         cout << "Coords: (" << listing.coord_lon << ", " << listing.coord_lat << ")\n\n";
     }
