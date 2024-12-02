@@ -5,9 +5,11 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
-#include "include/rapidjson-src/include/rapidjson/document.h"
-#include "include/rapidjson-src/include/rapidjson/filereadstream.h"
-#include "include/rapidjson-src/include/rapidjson/reader.h"
+
+// NOTE: check header path
+#include "include/rapidjson/document.h"
+#include "include/rapidjson/filereadstream.h"
+#include "include/rapidjson/reader.h"
 
 using namespace rapidjson;
 using namespace std;
@@ -34,6 +36,8 @@ struct Listing {
 
     //custom field for our own purposes
     double distance = nanf(""); //sets this value to NaN until we initialize it
+
+    bool operator<(const Listing& other) const;
 };
 
 bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName);
