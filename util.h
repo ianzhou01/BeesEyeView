@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+
+// REPLACE WITH YOUR LOCAL HEADER PATH
 #include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/document.h"
 #include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/filereadstream.h"
 #include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/reader.h"
