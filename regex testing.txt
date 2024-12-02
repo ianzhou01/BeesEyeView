@@ -1,0 +1,33 @@
+{"id": 40438184, "name": "90 m2 atypical design close to the SACRE COEUR - Professional Cleaning", "host_id": 312794780, "neighbourhood": "Buttes-Montmartre", "room_type": "Entire home/apt", "column_10": 210, "minimum_nights": 1, "number_of_reviews": 3, "last_review": "2020-01-11", "reviews_per_month": 0.56, "calculated_host_listings_count": 1, "availability_365": 0, "updated_date": "2020-06-11", "city": "Paris", "column_19": "France", "coordinates": {"lon": 2.356893361174352, "lat": 48.889171083723596}, "column_20": "France, Paris, Buttes-Montmartre"}
+
+
+
+
+^{"id": [0-9]*?, "name": ".*?"}$
+^{\"id\": [0-9]*?, \"name\": \"*?\"}$
+
+{"id": 40438184, "name": "90 m2 atypical design close to the SACRE COEUR - Professional Cleaning"}
+{"id": 40438184}
+
+
+
+
+{
+    "id": 40438184,
+    "name": "90 m2 atypical design close to the SACRE COEUR - Professional Cleaning",
+    "host_id": 312794780,
+    "neighbourhood": "Buttes-Montmartre",
+    "room_type": "Entire home/apt",
+    "column_10": 210,
+    "minimum_nights": 1,
+    "number_of_reviews": 3,
+    "last_review": "2020-01-11",
+    "reviews_per_month": 0.56,
+    "calculated_host_listings_count": 1,
+    "availability_365": 0,
+    "updated_date": "2020-06-11",
+    "city": "Paris",
+    "column_19": "France",
+    "coordinates": {"lon": 2.356893361174352, "lat": 48.889171083723596},
+    "column_20": "France, Paris, Buttes-Montmartre"
+}
