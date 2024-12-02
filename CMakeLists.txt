@@ -5,7 +5,5 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(AirBnB
     main.cpp
-    timsort.cpp
-    introsort.cpp
-    util.cpp
+        util.cpp
 )
