@@ -18,6 +18,7 @@ add_executable(AirBnB
     dev.cpp
     timsort.cpp
     introsort.cpp
+    util.cpp
 )
 
 target_include_directories(AirBnB PRIVATE ${rapidjson_SOURCE_DIR}/include)
