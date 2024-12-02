@@ -6,7 +6,6 @@
  ******************************/
 
 #include <iostream>
-#include "dev.h"
 #include "util.h"
 #include "introsort.h"
 #include "timsort.h"
