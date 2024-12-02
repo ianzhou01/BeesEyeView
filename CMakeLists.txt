@@ -4,6 +4,6 @@ project(AirBnB)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(AirBnB
-    main.cpp
-        util.cpp
+        src/main.cpp
+        src/util.cpp
 )

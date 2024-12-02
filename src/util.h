@@ -6,7 +6,7 @@
 #include <vector>
 #include <cmath>
 
-// REPLACE WITH YOUR LOCAL HEADER PATH
+// NOTE: check header path
 #include "include/rapidjson-src/include/rapidjson/document.h"
 #include "include/rapidjson-src/include/rapidjson/filereadstream.h"
 #include "include/rapidjson-src/include/rapidjson/reader.h"
