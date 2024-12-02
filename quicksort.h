@@ -20,30 +20,29 @@ void QuickSort::sort(vector<T>& arr) {
 template<class T>
 void QuickSort::quickSort(vector<T>& arr, int low, int high) {
     if (low < high) {
-        // Partition the array
+        // Partition array
         int pi = partition(arr, low, high);
 
-        // Recursively sort the two halves
-        quickSort(arr, low, pi - 1); // Left of the pivot
-        quickSort(arr, pi + 1, high); // Right of the pivot
+        // Pivot is now in position
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
     }
 }
 
 template<class T>
 int QuickSort::partition(vector<T>& arr, int low, int high) {
-    // Choose the pivot element (here, we choose the last element as pivot)
+    // Choose pivot element (here, we choose the last element)
     T pivot = arr[high];
     int i = low - 1; // Index of smaller element
 
-    // Traverse the array, rearranging elements so that those less than the pivot
-    // are on the left and those greater than the pivot are on the right
+    // Traverse array, rearranging elements
     for (int j = low; j <= high - 1; ++j) {
         if (arr[j] <= pivot) {
             ++i;
             swap(arr[i], arr[j]);
         }
     }
-    // Place the pivot in its correct position
+    // Place the pivot in position
     swap(arr[i + 1], arr[high]);
-    return i + 1; // Return the index of the pivot
+    return i + 1; // Return pivot index
 }
