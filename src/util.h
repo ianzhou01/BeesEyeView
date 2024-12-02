@@ -7,9 +7,9 @@
 #include <cmath>
 
 // NOTE: check header path
-#include "include/rapidjson-src/include/rapidjson/document.h"
-#include "include/rapidjson-src/include/rapidjson/filereadstream.h"
-#include "include/rapidjson-src/include/rapidjson/reader.h"
+#include "include/rapidjson/document.h"
+#include "include/rapidjson/filereadstream.h"
+#include "include/rapidjson/reader.h"
 
 using namespace rapidjson;
 using namespace std;
