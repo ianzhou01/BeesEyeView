@@ -30,6 +30,11 @@ int main(){
         cout << "No listings found. :(\n";
         return 0;
     }
+    auto priceComp = [](const Listing& a, const Listing& b) {
+        return a.price < b.price;
+    };
+
+    intro::sort(listings, listComp(priceComp));
 
     for (const auto &listing : listings) {
         cout << "Name: " << listing.name << endl;

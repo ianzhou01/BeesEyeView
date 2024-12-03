@@ -1,7 +1,12 @@
 #include "util.h"
 
+// Defaults to distance comparison
 bool Listing::operator<(const Listing &other) const {
     return (this->distance < other.distance);
+}
+
+bool Listing::operator>(const Listing &other) const {
+    return (this->distance > other.distance);
 }
 
 bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName)  {
