@@ -5,12 +5,16 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
-#include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/document.h"
-#include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/filereadstream.h"
-#include "cmake-build-debug/_deps/rapidjson-src/include/rapidjson/reader.h"
+
+// NOTE: check header path
+#include "include/rapidjson/document.h"
+#include "include/rapidjson/filereadstream.h"
+#include "include/rapidjson/reader.h"
 
 using namespace rapidjson;
 using namespace std;
+
+const double R = 6371.0; // Earth's radius in km
 
 struct Listing {
     // Items are written in the order they appear in the JSON files
@@ -34,7 +38,13 @@ struct Listing {
 
     //custom field for our own purposes
     double distance = nanf(""); //sets this value to NaN until we initialize it
+
+    // Defaults to distance comparison (unused currently)
+    bool operator<(const Listing& other) const;
+    bool operator>(const Listing& other) const;
 };
 
-bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName);
+bool getListings(vector<Listing>& listings, const int maxPrice, const string& fileName, const pair<double, double>& coords);
 
+double toRadians(double degree);
+double haversine(double lat1, double lon1, double lat2, double lon2);

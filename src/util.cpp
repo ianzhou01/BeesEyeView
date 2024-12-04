@@ -1,6 +1,16 @@
 #include "util.h"
 
-bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName)  {
+// Defaults to distance comparison
+bool Listing::operator<(const Listing &other) const {
+    return (this->distance < other.distance);
+}
+
+bool Listing::operator>(const Listing &other) const {
+    return (this->distance > other.distance);
+}
+
+bool getListings(vector<Listing>& listings, const int maxPrice,
+                 const string& fileName, const pair<double, double>& coords) {
     ifstream file(fileName);
     if (!file.is_open()){
         cerr << "Error opening file: " << fileName << endl;
@@ -62,10 +72,39 @@ bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const str
                 available_listing.coord_lon = listing["coordinates"]["lon"].GetDouble();
                 available_listing.coord_lat = listing["coordinates"]["lat"].GetDouble();
 
+                available_listing.distance = haversine(coords.first,
+                                                       coords.second,
+                                                       available_listing.coord_lat,
+                                                       available_listing.coord_lon);
+
                 // Add to the result vector
                 listings.push_back(available_listing);
             }
         }
     }
     return true;
+}
+
+double toRadians(double degree) {
+    return degree * (M_PI / 180.0);
+}
+
+double haversine(double lat1, double lon1, double lat2, double lon2) {
+    lat1 = toRadians(lat1);
+    lon1 = toRadians(lon1);
+    lat2 = toRadians(lat2);
+    lon2 = toRadians(lon2);
+
+    // difference in coordinates
+    double dlat = lat2 - lat1;
+    double dlon = lon2 - lon1;
+
+    // Use formula
+    double a = sin(dlat / 2) * sin(dlat / 2) +
+               cos(lat1) * cos(lat2) *
+               sin(dlon / 2) * sin(dlon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    // Distance in km
+    return R * c;
 }
