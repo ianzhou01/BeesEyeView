@@ -22,6 +22,8 @@ int main(){
     cout << " By: Ian Zhou, Phoenix Cushman, Matthew Golden" << endl;
     cout << "------------------------------------------------" << endl;
 
+    // Initialize all jsons here
+    vector<string> jsonData{"data/air-bnb-sample.json"};
     // TODO:
     //Getting initial location data for distance calculations
     cout << "Enter the location to search from (lat lon):";
@@ -56,10 +58,14 @@ int main(){
         cout << endl;
     }
     vector<Listing> listings;
-    if (!getListings(listings, max_price,
-                     "../data/air-bnb-sample.json", {lat, lon})) {
-        return -1;
+
+    for (const string &json : jsonData) {
+        if (!getListings(listings, max_price,
+                         json, {lat, lon})) {
+            return -1;
+        }
     }
+
     if (listings.empty()) {
         cout << "No listings found. :(\n";
         return 0;
@@ -133,7 +139,7 @@ int main(){
         auto end = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(end - start);
 
-        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " ms\n\nListings:\n\n";
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
     }
     else if (sort_choice == "2") {
         // Use Introsort (implemented timer)
@@ -155,7 +161,7 @@ int main(){
         auto end = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(end - start);
 
-        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " ms\n\nListings:\n\n";
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
     }
     else {
         cerr << "Something went terribly wrong. What a bother." << endl;
