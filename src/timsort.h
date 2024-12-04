@@ -32,7 +32,7 @@ void tim::sort(vector<Listing>& arr, listComp lessThan){
 //Basic insertion sort
 void tim::insertionSort(vector<Listing>& arr, int l, int r, listComp lessThan) {
     for (int i = l + 1; i <= r; i++) {
-        Listing temp = arr[i];
+        Listing& temp = arr[i];
         int j = i - 1;
         while (j >= l && lessThan(temp, arr[j])) {
             arr[j + 1] = arr[j];
