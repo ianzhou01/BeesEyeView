@@ -40,5 +40,6 @@ struct Listing {
     bool operator<(const Listing& other) const;
 };
 
+bool getListingsByDistance(vector<Listing>& listings, const double latitude, const double longitude, const double radius, const string& filename);
 bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName);
 
