@@ -9,7 +9,7 @@
 #pragma once
 #include <cmath>
 #include <vector>
-#define listComp function<bool(const Listing&, const Listing&)>
+#include "common_defs.h"
 using namespace std;
 
 class tim {
