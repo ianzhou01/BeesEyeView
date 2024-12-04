@@ -22,7 +22,10 @@ int main(){
     cout << " By: Ian Zhou, Phoenix Cushman, Matthew Golden" << endl;
     cout << "------------------------------------------------" << endl;
 
+    // Initialize all jsons here
+    vector<string> jsonData{"data/air-bnb-sample.json"};
     // TODO:
+    //Getting initial location data for distance calculations
     cout << "Enter the location to search from (lat lon):";
     double lat, lon;
     cin >> lat >> lon;
@@ -43,27 +46,32 @@ int main(){
 //        cin >> search_radius;
 //    }
 
-    cout << "Enter your maximum room rate ($1 - $100,000): $";
+    //Gets max room rate user is willing to pay
+    cout << "Enter your maximum room rate ($1 - $250,000,000): $";
     int max_price;
     cin >> max_price;
-    while (max_price < 1 || max_price > 100000) {
-        cout << "\nInvalid input, please enter a number within the given range ($1 - $100,000): $";
+    while (max_price < 1 || max_price > 250000000) {
+        cout << "\nInvalid input, please enter a number within the given range ($1 - $250,000,000): $";
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         cin >> max_price;
         cout << endl;
     }
     vector<Listing> listings;
-    if (!getListings(listings, max_price,
-                     "data/air-bnb-sample.json", {lat, lon})) {
-        return -1;
+
+    for (const string &json : jsonData) {
+        if (!getListings(listings, max_price,
+                         json, {lat, lon})) {
+            return -1;
+        }
     }
+
     if (listings.empty()) {
         cout << "No listings found. :(\n";
         return 0;
     }
 
-    // Get sort parameter
+    // Gets sort parameter
     cout << "What property would you like to sort by?" << endl
          << "1. distance" << endl
          << "2. price" << endl
@@ -79,7 +87,7 @@ int main(){
         cin >> property_choice;
     }
 
-    // Get sort method
+    // Gets sort method
     cout << "How would you like to sort your data?" << endl
          << "1. timsort" << endl
          << "2. introsort" << endl
@@ -95,13 +103,14 @@ int main(){
         cin >> sort_choice;
     }
 
+    //Gets the number of entries to display
     int numListings;
-    cout << "How many entries to display? Enter a number:";
+    cout << "How many entries to display? Enter a number (1 - 1414018):";
     cin >> numListings;
-    while (cin.fail() || numListings < 0) {
+    while (cin.fail() || numListings < 0 || numListings > 1414018) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        cout << "Enter a valid number!\nHow many entries to display? Enter a number:";
+        cout << "Enter a valid number!\nHow many entries to display? Enter a number (1 - 1414018):";
         cin >> numListings;
     }
 
@@ -112,20 +121,34 @@ int main(){
     };
 
     if (sort_choice == "1") {
-        // Use Timsort (implement timer feature later)
+        // Use Timsort (implemented timer)
+        auto start = high_resolution_clock::now();
+        tim::sort(listings, listComp(distComp));
 
+        // Note: we don't need to sort by distance again, so property_choice of 1 is trivial
+        if (property_choice == "2") {
+            // Sort top numListings by price
+            auto priceComp = [](const Listing& a, const Listing& b)-> bool {
+                return a.price < b.price;
+            };
+            // Sort first numListings elements
+            tim::sort(listings, listComp(priceComp));
+        }
+
+        //Output time for sorts
+        auto end = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(end - start);
+
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
     }
     else if (sort_choice == "2") {
         // Use Introsort (implemented timer)
         auto start = high_resolution_clock::now();
         intro::sort(listings, listComp(distComp));
-        auto end = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(end - start);
 
-        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
         // Note: we don't need to sort by distance again, so property_choice of 1 is trivial
         if (property_choice == "2") {
-            // Sort top 10 by price
+            // Sort top numListings by price
             auto priceComp = [](const Listing& a, const Listing& b)-> bool {
                 return a.price < b.price;
             };
@@ -134,21 +157,24 @@ int main(){
                         listComp(priceComp));
         }
 
-        for (int i = 0; i < min(numListings, (int)listings.size()); ++i) {
-            cout << "Name: " << listings[i].name << endl;
-            cout << "Rate: $" << listings[i].price << endl;
-            cout << "Days available: " << listings[i].availability << endl;
-            cout << fixed << setprecision(4) << "Distance: " << listings[i].distance << " km\n\n";
-        }
+        //Output time for sorts
+        auto end = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(end - start);
+
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
     }
     else {
         cerr << "Something went terribly wrong. What a bother." << endl;
         return -1;
     }
 
-
-
-
+    //Output results
+    for (int i = 0; i < min(numListings, (int)listings.size()); ++i) {
+        cout << "Name: " << listings[i].name << endl;
+        cout << "Rate: $" << listings[i].price << endl;
+        cout << "Days available: " << listings[i].availability << endl;
+        cout << fixed << setprecision(4) << "Distance: " << listings[i].distance << " km\n\n";
+    }
 
     // do some sort of user interface to ask for parameters
     //
