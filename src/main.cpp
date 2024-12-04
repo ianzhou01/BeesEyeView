@@ -13,8 +13,6 @@ int main(){
     cout << " By: Ian Zhou, Phoenix Cushman, Matthew Golden" << endl;
     cout << "------------------------------------------------" << endl;
 
-    // Initialize all jsons here
-    vector<string> jsonData{"data/air-bnb-sample.json"};
     // TODO:
     //Getting initial location data for distance calculations
     cout << "Enter the location to search from (lat lon):";
@@ -50,9 +48,10 @@ int main(){
     }
     vector<Listing> listings;
 
-    for (const string &json : jsonData) {
+    for (int i=1; i<=40; ++i) {
         if (!getListings(listings, max_price,
-                         json, {lat, lon})) {
+                         "../data/all_data/split_" + to_string(i) + ".json",
+                         {lat, lon})) {
             return -1;
         }
     }
@@ -96,12 +95,12 @@ int main(){
 
     //Gets the number of entries to display
     int numListings;
-    cout << "How many entries to display? Enter a number (1 - 1414018):";
+    cout << "How many entries to display? Enter a number (1 - 100):";
     cin >> numListings;
-    while (cin.fail() || numListings < 0 || numListings > 1414018) {
+    while (cin.fail() || numListings < 0 || numListings > 100) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        cout << "Enter a valid number!\nHow many entries to display? Enter a number (1 - 1414018):";
+        cout << "Enter a valid number!\nHow many entries to display? Enter a number (1 - 100):";
         cin >> numListings;
     }
 
@@ -128,9 +127,9 @@ int main(){
 
         //Output time for sorts
         auto end = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
 
-        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " ms\n\nListings:\n\n";
     }
     else if (sort_choice == "2") {
         // Use Introsort (implemented timer)
@@ -150,9 +149,9 @@ int main(){
 
         //Output time for sorts
         auto end = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
 
-        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " ms\n\nListings:\n\n";
     }
     else {
         cerr << "Something went terribly wrong. What a bother." << endl;
