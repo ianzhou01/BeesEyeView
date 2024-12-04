@@ -44,10 +44,22 @@ bool getListings(vector<Listing>& listings, const int maxPrice,
             {
                 Listing available_listing;
                 available_listing.id = listing["id"].GetInt();
-                available_listing.name = listing["name"].GetString();
+                if (listing.HasMember("name") && listing["name"].IsString()) {
+                    available_listing.name = listing["name"].GetString();
+                } else {
+                    available_listing.name = "N/A"; // Can change
+                }
                 available_listing.host_id = listing["host_id"].GetInt();
-                available_listing.neighbourhood = listing["neighbourhood"].GetString();
-                available_listing.room_type = listing["room_type"].GetString();
+                if (listing.HasMember("neighbourhood") && listing["neighbourhood"].IsString()) {
+                    available_listing.neighbourhood = listing["neighbourhood"].GetString();
+                } else {
+                    available_listing.neighbourhood = "N/A"; // Can change
+                }
+                if (listing.HasMember("room_type") && listing["room_type"].IsString()) {
+                    available_listing.room_type = listing["room_type"].GetString();
+                } else {
+                    available_listing.room_type = "N/A"; // Can change
+                }
                 available_listing.price = listing["column_10"].GetInt();
                 available_listing.minimum_nights = listing["minimum_nights"].GetInt();
                 available_listing.num_reviews = listing["number_of_reviews"].GetInt();
@@ -66,9 +78,21 @@ bool getListings(vector<Listing>& listings, const int maxPrice,
 
                 available_listing.calculated_host_listings_count = listing["calculated_host_listings_count"].GetInt();
                 available_listing.availability = listing["availability_365"].GetInt();
-                available_listing.updated_date = listing["updated_date"].GetString();
-                available_listing.city = listing["city"].GetString();
-                available_listing.country = listing["column_19"].GetString();
+                if (listing.HasMember("updated_date") && listing["updated_date"].IsString()) {
+                    available_listing.updated_date = listing["updated_date"].GetString();
+                } else {
+                    available_listing.updated_date = "N/A";
+                }
+                if (listing.HasMember("city") && listing["city"].IsString()) {
+                    available_listing.city = listing["city"].GetString();
+                } else {
+                    available_listing.city = "N/A";
+                }
+                if (listing.HasMember("column_19") && listing["column_19"].IsString()) {
+                    available_listing.country = listing["column_19"].GetString();
+                } else {
+                    available_listing.country = "N/A";
+                }
                 available_listing.coord_lon = listing["coordinates"]["lon"].GetDouble();
                 available_listing.coord_lat = listing["coordinates"]["lat"].GetDouble();
 
