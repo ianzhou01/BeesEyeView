@@ -5,16 +5,7 @@
  * Created: 11/30/2024
  ******************************/
 
-#include <iostream>
-#include "util.h"
-#include "introsort.h"
-#include "timsort.h"
-#include <cfloat>
-#include <iomanip>
-#include <chrono>
-
-using namespace std;
-using namespace std::chrono;
+#include "window.h" // Main will change when window is implemented, but all headers are moved to window.h for now
 
 int main(){
     cout << "------------------------------------------------" << endl;
