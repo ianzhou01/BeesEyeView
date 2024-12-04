@@ -7,6 +7,8 @@ add_executable(AirBnB
         src/main.cpp
         src/util.cpp
         src/window.cpp
+        src/introsort.cpp
+        src/timsort.cpp
 )
 
 target_link_libraries(AirBnB sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
