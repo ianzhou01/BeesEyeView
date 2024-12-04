@@ -122,7 +122,7 @@ int main(){
         auto end = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(end - start);
 
-        cout << "Sorted through " << listings.size() << " available listings in " << duration.count() << " ms.\n\n";
+        cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " ms\n\nListings:\n\n";
         // Note: we don't need to sort by distance again, so property_choice of 1 is trivial
         if (property_choice == "2") {
             // Sort top 10 by price
