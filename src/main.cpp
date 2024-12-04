@@ -113,7 +113,7 @@ int main(){
 
     if (sort_choice == "1") {
         // Use Timsort (implemented timer)
-        auto start = high_resolution_clock::now();
+        auto start = chrono::high_resolution_clock::now();
         tim::sort(listings, listComp(distComp));
 
         // Note: we don't need to sort by distance again, so property_choice of 1 is trivial
@@ -127,14 +127,14 @@ int main(){
         }
 
         //Output time for sorts
-        auto end = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(end - start);
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
 
         cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
     }
     else if (sort_choice == "2") {
         // Use Introsort (implemented timer)
-        auto start = high_resolution_clock::now();
+        auto start = chrono::high_resolution_clock::now();
         intro::sort(listings, listComp(distComp));
 
         // Note: we don't need to sort by distance again, so property_choice of 1 is trivial
@@ -149,8 +149,8 @@ int main(){
         }
 
         //Output time for sorts
-        auto end = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(end - start);
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
 
         cout << "\nSorted through " << listings.size() << " available listings in " << duration.count() << " microseconds\n\nListings:\n\n";
     }
