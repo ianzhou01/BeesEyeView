@@ -14,6 +14,8 @@
 using namespace rapidjson;
 using namespace std;
 
+const double R = 6371.0; // Earth's radius in km
+
 struct Listing {
     // Items are written in the order they appear in the JSON files
     int id;
@@ -42,5 +44,7 @@ struct Listing {
     bool operator>(const Listing& other) const;
 };
 
-bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName);
+double haversine(double lat1, double lon1, double lat2, double lon2);
+
+bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName, const pair<double, double>& coords);
 

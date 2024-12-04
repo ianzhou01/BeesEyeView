@@ -9,38 +9,80 @@
 #include "util.h"
 #include "introsort.h"
 #include "timsort.h"
+#include <iomanip>
 
 int main(){
-    
-    std::cout << "------------------------------------------------" << std::endl;
-    std::cout << "     COP3530 Project 3 - Bee's Eye View" << std::endl;
-    std::cout << " By: Ian Zhou, Phoenix Cushman, Matthew Golden" << std::endl;
-    std::cout << "------------------------------------------------" << std::endl;
+    cout << "------------------------------------------------" << endl;
+    cout << "     COP3530 Project 3 - Bee's Eye View" << endl;
+    cout << " By: Ian Zhou, Phoenix Cushman, Matthew Golden" << endl;
+    cout << "------------------------------------------------" << endl;
 
-    // TODO:
+    cout << "Enter your coordinates below in degrees (N and E positive, W and S negative):\n"
+            "Latitude:";
+    double lat, lon;
+    cin >> lat;
+    while (cin.fail()) {
+        cin.clear(); // Reset error flags
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Please enter a valid value!\nLatitude:";
+        cin >> lat;
+    }
+    cout << "Longitude:";
+    cin >> lon;
+    while (cin.fail()) {
+        cin.clear(); // Reset error flags
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Please enter a valid value!\nLongitude:";
+        cin >> lon;
+    }
+
     cout << "Enter your maximum room rate: $";
     int max_price;
     cin >> max_price;
+    while (cin.fail()) {
+        cin.clear(); // Reset error flags
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Please enter a valid value!\nEnter your maximum room rate: $";
+        cin >> max_price;
+    }
+
     vector<Listing> listings;
 
-    if (!getListingsByPrice(listings, max_price, "data/air-bnb-sample.json")) {
+    if (!getListingsByPrice(listings, max_price,
+                            "data/air-bnb-sample.json", {lat, lon})) {
         return -1;
     }
     if (listings.empty()) {
         cout << "No listings found. :(\n";
         return 0;
     }
-    auto priceComp = [](const Listing& a, const Listing& b) {
-        return a.price < b.price;
+
+    auto distComp = [](const Listing& a, const Listing& b)-> bool {
+        return a.distance < b.distance;
     };
 
-    intro::sort(listings, listComp(priceComp));
+    intro::sort(listings, listComp(distComp));
 
-    for (const auto &listing : listings) {
-        cout << "Name: " << listing.name << endl;
-        cout << "Rate: $" << listing.price << endl;
-        cout << "Days available: " << listing.availability << endl;
-        cout << "Coords: (" << listing.coord_lon << ", " << listing.coord_lat << ")\n\n";
+    cout << "Would you like results sorted by cheapest or closest (Y/y for cheapest, anything else for closest)";
+    char priceSort;
+    cin >> priceSort;
+    cin.clear(); // Reset error flags
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // clear buffer
+
+    if (priceSort == 'Y' || priceSort == 'y') {
+        auto priceComp = [](const Listing& a, const Listing& b)-> bool {
+            return a.price < b.price;
+        };
+        // Sort first 10 elements, or whatever's in there
+        intro::sort(listings, 0, min(10, (int)listings.size()),
+                    listComp(priceComp));
+    }
+
+    for (int i = 0; i < min(10, (int)listings.size()); ++i) {
+        cout << "Name: " << listings[i].name << endl;
+        cout << "Rate: $" << listings[i].price << endl;
+        cout << "Days available: " << listings[i].availability << endl;
+        cout << fixed << setprecision(4) << "Distance: " << listings[i].distance << " km\n";
     }
 
     // do some sort of user interface to ask for parameters

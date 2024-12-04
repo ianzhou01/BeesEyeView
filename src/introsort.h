@@ -15,6 +15,7 @@ using namespace std;
 class intro {
 public:
     static void sort(vector<Listing>& arr, listComp lessThan);
+    static void sort(vector<Listing>& arr, int start, int end, listComp lessThan);
 private:
 
     static void introsort(vector<Listing>& arr, int start, int end, int depthLimit, listComp lessThan);
@@ -31,8 +32,23 @@ private:
 
 void intro::sort(vector<Listing>& arr,
                  listComp lessThan) {
-    int depthLimit = 2 * log2(arr.size());
+    int depthLimit = 2 * static_cast<int>(log2(arr.size()));
     introsort(arr, 0, arr.size() - 1, depthLimit, lessThan);
+}
+
+void intro::sort(vector<Listing> &arr, int start, int end,
+                 function<bool(const Listing &, const Listing &)> lessThan) {
+    int n = arr.size();
+    // If "end" is out of range, sort whole array
+    if (end >= n)
+        end = n - 1;
+    // If start invalid or start ahead of end, error found. (If start >= n, then start > (end <= n-1) will execute)
+    if (start < 0 || start > end)
+        throw runtime_error("Invalid sorting range! start = \" + to_string(start) +\n"
+                            "                        \", end = \" + to_string(end)");
+
+    int depthLimit = 2 * static_cast<int>(log2(n));
+    introsort(arr, start, end, depthLimit, lessThan);
 }
 
 void intro::introsort(vector<Listing>& arr, int start, int end, int depthLimit,
@@ -118,3 +134,5 @@ void intro::insertionSort(vector<Listing>& arr, int start, int end,
         arr[j + 1] = key;
     }
 }
+
+
