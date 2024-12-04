@@ -70,7 +70,7 @@ void intro::introsort(vector<Listing>& arr, int start, int end, int depthLimit,
 
 int intro::partition(vector<Listing>& arr, int start, int end,
                      listComp lessThan) {
-    Listing pivot = arr[end]; // Choose last element as the pivot
+    Listing& pivot = arr[end]; // Choose last element as the pivot
     int i = start - 1;
 
     for (int j = start; j < end; ++j) {
@@ -123,7 +123,7 @@ void intro::heapify(vector<Listing>& arr, int n, int i, int start,
 void intro::insertionSort(vector<Listing>& arr, int start, int end,
                           listComp lessThan) {
     for (int i = start + 1; i <= end; ++i) {
-        Listing key = arr[i];
+        Listing& key = arr[i];
         int j = i - 1;
 
         // Keep going while key < arr[j]
