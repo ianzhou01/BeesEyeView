@@ -19,7 +19,7 @@ void tim::insertionSort(vector<Listing>& arr, int l, int r, listComp lessThan) {
 }
 
 //Basic merge
-void tim::merge(vector<Listing> &arr, int l, int m, int r, listComp lessThan) {
+void tim::merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan) {
     int left_size = m - l + 1;
     int right_size = r - m;
     Listing left_array[left_size], right_array[right_size];
@@ -65,7 +65,7 @@ void tim::merge(vector<Listing> &arr, int l, int m, int r, listComp lessThan) {
 }
 
 //Tim sort
-void tim::timsort(vector<Listing> &arr, int length, int RUNSIZE, listComp lessThan) {
+void tim::timsort(vector<Listing>& arr, int length, int RUNSIZE, listComp lessThan) {
     //Separates array into RUNSIZE chunks and insertsion sorts each of those chunks
     for (int i = 0; i < length; i += RUNSIZE) {
         insertionSort(arr, i, min(i + RUNSIZE - 1, length - 1), lessThan);

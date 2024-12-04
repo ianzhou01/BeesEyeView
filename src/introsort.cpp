@@ -6,7 +6,7 @@ void intro::sort(vector<Listing>& arr,
     introsort(arr, 0, arr.size() - 1, depthLimit, lessThan);
 }
 
-void intro::sort(vector<Listing> &arr, int start, int end,
+void intro::sort(vector<Listing>& arr, int start, int end,
                  function<bool(const Listing &, const Listing &)> lessThan) {
     int n = arr.size();
     // If "end" is out of range, sort whole array
