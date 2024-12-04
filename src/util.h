@@ -44,7 +44,7 @@ struct Listing {
     bool operator>(const Listing& other) const;
 };
 
+bool getListings(vector<Listing>& listings, const int maxPrice, const string& fileName, const pair<double, double>& coords);
+
+double toRadians(double degree);
 double haversine(double lat1, double lon1, double lat2, double lon2);
-
-bool getListingsByPrice(vector<Listing>& listings, const int maxPrice, const string& fileName, const pair<double, double>& coords);
-

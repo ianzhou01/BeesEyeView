@@ -9,8 +9,8 @@ bool Listing::operator>(const Listing &other) const {
     return (this->distance > other.distance);
 }
 
-bool getListingsByPrice(vector<Listing>& listings, const int maxPrice,
-                        const string& fileName, const pair<double, double>& coords) {
+bool getListings(vector<Listing>& listings, const int maxPrice,
+                 const string& fileName, const pair<double, double>& coords) {
     ifstream file(fileName);
     if (!file.is_open()){
         cerr << "Error opening file: " << fileName << endl;
