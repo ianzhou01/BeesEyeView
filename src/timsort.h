@@ -9,32 +9,32 @@
 #pragma once
 #include <cmath>
 #include <vector>
-
+#define listComp function<bool(const Listing&, const Listing&)>
 using namespace std;
 
 class tim {
 public:
-    template <class T>
-    static void sort(vector<T>& arr);
+    static void sort(vector<Listing>& arr, listComp lessThan);
 
 private:
-    template <class T>
-    static void timsort(vector<T>& arr, int length);
+    static void timsort(vector<Listing>& arr, int length, int RUNSIZE, listComp lessThan);
 
-    template <class T>
-    static void merge(vector<T>& arr, int l, int m, int r);
+    static void merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan);
 
-    template <class T>
-    static void insertionSort(vector<T>& arr, int l, int r);
+    static void insertionSort(vector<Listing>& arr, int l, int r, listComp lessThan);
 };
 
+void tim::sort(vector<Listing>& arr, listComp lessThan){
+    int RUNSIZE = 32;
+    timsort(arr, arr.size(), RUNSIZE, lessThan);
+}
+
 //Basic insertion sort
-template <class T>
-void tim::insertionSort(vector<T>& arr, int l, int r) {
+void tim::insertionSort(vector<Listing>& arr, int l, int r, listComp lessThan) {
     for (int i = l + 1; i <= r; i++) {
-        int temp = arr[i];
+        Listing temp = arr[i];
         int j = i - 1;
-        while (j >= l && arr[j] > temp) {
+        while (j >= l && lessThan(temp, arr[j])) {
             arr[j + 1] = arr[j];
             j--;
         }
@@ -43,11 +43,10 @@ void tim::insertionSort(vector<T>& arr, int l, int r) {
 }
 
 //Basic merge
-template<class T>
-void tim::merge(vector<T> &arr, int l, int m, int r) {
+void tim::merge(vector<Listing> &arr, int l, int m, int r, listComp lessThan) {
     int left_size = m - l + 1;
     int right_size = r - m;
-    int left_array[left_size], right_array[right_size];
+    Listing left_array[left_size], right_array[right_size];
 
     //Getting values of left and right arrays
     for (int i = 0; i < left_size; i++) {
@@ -63,7 +62,7 @@ void tim::merge(vector<T> &arr, int l, int m, int r) {
 
     //Doing the merge and inserting smallest of the left_array and right_array to output
     while (left_index < left_size && right_index < right_size) {
-        if (left_array[left_index] <= right_array[right_index]) {
+        if (lessThan(left_array[left_index], right_array[right_index])) {
             arr[merged_index] = left_array[left_index];
             left_index++;
         }
@@ -90,14 +89,10 @@ void tim::merge(vector<T> &arr, int l, int m, int r) {
 }
 
 //Tim sort
-template<class T>
-void tim::timsort(vector<T> &arr, int length) {
-    //Size of insertion sorts
-    int RUNSIZE = 32;
-
+void tim::timsort(vector<Listing> &arr, int length, int RUNSIZE, listComp lessThan) {
     //Separates array into RUNSIZE chunks and insertsion sorts each of those chunks
     for (int i = 0; i < length; i += RUNSIZE) {
-        insertionSort(arr, i, min(i + RUNSIZE - 1, length - 1));
+        insertionSort(arr, i, min(i + RUNSIZE - 1, length - 1), lessThan);
     }
 
     //Goes through and merges the chunks that were insertion sorted
@@ -106,7 +101,7 @@ void tim::timsort(vector<T> &arr, int length) {
             int middle = left + size - 1;
             int right = min(left + 2 * size - 1,  length - 1);
             if (middle < right) {
-                merge(arr, left, middle, right);
+                merge(arr, left, middle, right, lessThan);
             }
         }
     }
