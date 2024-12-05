@@ -7,18 +7,21 @@
 
 #pragma once
 #include <iostream>
-#include "util.h" // Listing class and Json parsing
-#include "introsort.h"
-#include "timsort.h"
+#include <unordered_map>
 #include <cfloat>
 #include <iomanip>
 #include <chrono> // For timing functions
-#include <SFML/Graphics.hpp>
+#include "button.h"
+#include "introsort.h"
+#include "timsort.h"
+#include "util.h" // Listing class and Json parsing
 
 using namespace std;
 
 const int WIDTH = 1280;
 const int HEIGHT = 720;
+
+enum InputBoxType { None, Latitude, Longitude, MaxPrice, DisplayCount };
 
 class Window {
 public:
@@ -26,41 +29,51 @@ public:
     void operator()();
 
 private:
+    InputBoxType activeInputBox = None; // Tracks which input box is active
+    unordered_map<InputBoxType, string> inputStrings; // Store all input strings
+    unordered_map<InputBoxType, sf::Text> inputTexts;
+
+
     sf::RenderWindow win;
     sf::RectangleShape menuBar;
-    sf::RectangleShape resetButton;
+    Button resetButton;
     sf::Font menuFont;
-    sf::Text titleText, resetText;
+    sf::Text titleText;
     sf::Text errorText;
 
-    // Input fields for user parameters
-    sf::RectangleShape inputBoxLocation;
-    sf::RectangleShape inputBoxMaxPrice;
-    sf::RectangleShape inputBoxSortParameter;
-    sf::RectangleShape inputBoxSortMethod;
-    sf::RectangleShape inputBoxDisplayCount;
+    sf::Text cursor; // Blinking cursor
+    bool cursorVisible = true; // Cursor visibility
+    sf::Clock cursorClock; // Clock to manage blinking
 
-    sf::Text labelLocation, labelMaxPrice, labelSortParameter, labelSortMethod, labelDisplayCount;
-    sf::Text inputTextLocation, inputTextMaxPrice, inputTextSortParameter, inputTextSortMethod, inputTextDisplayCount;
+    // Input fields for user parameters
+    sf::RectangleShape inputBoxLat, inputBoxLong;
+    sf::RectangleShape inputBoxMaxPrice;
+    sf::RectangleShape methodDropdownButton, paramDropdownButton;
+    sf::RectangleShape inputBoxDisplayCount;
+    sf::Text methodDropdownButtonText, paramDropdownButtonText;
+
+    vector<sf::RectangleShape> sortMethodOptions, sortParamOptions;
+    vector<sf::Text> sortMethodOptionTexts, sortParamOptionTexts;
+    bool isMethodDropdownOpen = false, isParamDropdownOpen = false;
+    int methodOption = -1, paramOption = -1;
+
+    sf::Text latLocation, longLocation, labelMaxPrice, labelSortMethod, labelSortParam, labelDisplayCount;
 
     sf::RectangleShape outputList;
     vector<sf::Text> listingDisplay;
 
     // State variables for user input and current display
-    string locationInput;
+    string latInput, longInput;
     int maxPriceInput;
-    int sortParameterInput;
-    int sortMethodInput;
     int displayCountInput;
 
     vector<Listing> listings; // Listings from JSON parsing
 
     // Helper functions
-    void handleEvents();
     void renderUI();
     void resetParameters();
     void displayListings();
-    void validateInput();
     void fetchAndSortListings();
 };
 
+sf::Text renderText(const std::string& msg, const sf::Font& font, int size, sf::Color color, bool bold, bool underlined);
