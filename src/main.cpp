@@ -32,16 +32,6 @@ int main(){
         cin >> lat >> lon;
     }
 
-//    cout << "Enter the radius to search from:";
-//    double search_radius;
-//    cin >> search_radius;
-//    while (cin.fail() || search_radius < 0 || search_radius > 360) {
-//        cout << "\nInvalid input, please enter a valid radius to search:";
-//        cin.clear();
-//        cin.ignore(DBL_MAX, '\n');
-//        cin >> search_radius;
-//    }
-
     //Gets max room rate user is willing to pay
     cout << "Enter your maximum room rate ($1 - $250,000,000): $";
     int max_price;
@@ -172,15 +162,6 @@ int main(){
         cout << "Days available: " << listings[i].availability << endl;
         cout << fixed << setprecision(4) << "Distance: " << listings[i].distance << " km\n\n";
     }
-
-    // do some sort of user interface to ask for parameters
-    //
-    // run file i/o to grab the sample file
-    // repeatedly call the parseJsonSingle function to parse all the elements and push them all to a element vector
-        // filter out unnecessary elements as we go
-    // run the sorting algorithm on the vector
-    //
-    // return the top k results based off the user parameters in some sort of nifty looking interface
 
     return 0;
 }
