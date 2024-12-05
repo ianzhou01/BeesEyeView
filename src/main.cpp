@@ -13,7 +13,7 @@
 #include <cfloat>
 #include <iomanip>
 #include <chrono> // For timing functions
-#include <SFML/Graphics.hpp>
+
 int main(){
     cout << "------------------------------------------------" << endl;
     cout << "     COP3530 Project 3 - Bee's Eye View" << endl;
