@@ -76,7 +76,7 @@ int main(){
 
     string property_choice;
     cin >> property_choice;
-    while (property_choice != "1" && property_choice != "2" && property_choice != "3") {
+    while (property_choice != "1" && property_choice != "2") {
         cout << "\nPlease choose a valid option." << endl
              << "1. distance" << endl
              << "2. price" << endl
