@@ -9,10 +9,3 @@ add_executable(AirBnB
         src/introsort.cpp
         src/timsort.cpp
 )
-
-target_link_libraries(AirBnB sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
-set(SFML_STATIC_LIBRARIES TRUE)
-set(SFML_DIR C:/SFML/lib/cmake/SFML)
-find_package(SFML 2.5.1 COMPONENTS system window graphics audio network REQUIRED)
-
-include_directories(c:/SFML/include/SFML)
