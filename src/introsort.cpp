@@ -1,11 +1,13 @@
 #include "introsort.h"
 
+//Main sort to set up depth limit
 void intro::sort(vector<Listing>& arr,
                  listComp lessThan) {
     int depthLimit = 2 * static_cast<int>(log2(arr.size()));
     introsort(arr, 0, arr.size() - 1, depthLimit, lessThan);
 }
 
+//Introsort on a given range
 void intro::sort(vector<Listing>& arr, int start, int end,
                  function<bool(const Listing &, const Listing &)> lessThan) {
     int n = arr.size();
@@ -21,22 +23,28 @@ void intro::sort(vector<Listing>& arr, int start, int end,
     introsort(arr, start, end, depthLimit, lessThan);
 }
 
+//Intro sort
 void intro::introsort(vector<Listing>& arr, int start, int end, int depthLimit,
                       listComp lessThan) {
+    //Insertion sort for small pieces of data
     if (end - start <= 16) {
         insertionSort(arr, start, end, lessThan);
         return;
     }
+
+    //Heap sort if depth limit is reached
     if (depthLimit == 0) {
         heapsort(arr, start, end, lessThan);
         return;
     }
     int pivot = partition(arr, start, end, lessThan);
 
+    //Continue with quick sort
     introsort(arr, start, pivot - 1, depthLimit - 1, lessThan);
     introsort(arr, pivot + 1, end, depthLimit - 1, lessThan);
 }
 
+//Quick sort
 int intro::partition(vector<Listing>& arr, int start, int end,
                      listComp lessThan) {
     Listing pivot = arr[end]; // Choose last element as the pivot
@@ -51,6 +59,7 @@ int intro::partition(vector<Listing>& arr, int start, int end,
     return i + 1;
 }
 
+//Heap sort
 void intro::heapsort(vector<Listing>& arr, int start, int end,
                      listComp lessThan) {
     int n = end - start + 1;
@@ -67,6 +76,7 @@ void intro::heapsort(vector<Listing>& arr, int start, int end,
     }
 }
 
+//Basic heapify function
 void intro::heapify(vector<Listing>& arr, int n, int i, int start,
                     listComp lessThan) {
     int largest = i;
@@ -89,6 +99,7 @@ void intro::heapify(vector<Listing>& arr, int n, int i, int start,
     }
 }
 
+//Insertion sort
 void intro::insertionSort(vector<Listing>& arr, int start, int end,
                           listComp lessThan) {
     for (int i = start + 1; i <= end; ++i) {
