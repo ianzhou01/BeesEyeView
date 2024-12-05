@@ -63,9 +63,8 @@ private:
     vector<sf::Text> listingDisplay;
 
     // State variables for user input and current display
-    string latInput, longInput;
-    int maxPriceInput;
-    int displayCountInput;
+    float lat, lon;
+    int maxPrice, dispCt;
 
     vector<Listing> listings; // Listings from JSON parsing
 

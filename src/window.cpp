@@ -184,9 +184,46 @@ void Window::operator()() {
                 if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                     if (resetButton.clicked) {
                         resetParameters(); // Reset application state
+                    } else {
+                        errorText.setString(""); // Reset error anyway
                     }
                     if (runButton.clicked) {
+                        bool allFilled = true;
+                        // Validate input and run simulation
+                        for (const auto& [x, y] : inputStrings) {
+                            if (y.empty() || y == "-") {
+                                allFilled = false;
+                            }
+                        }
+                        if (methodOption == -1 || paramOption == -1)
+                            allFilled = false;
 
+                        if (allFilled) {
+                            lat = stof(inputStrings[Latitude]);
+                            lon = stof(inputStrings[Longitude]);
+                            maxPrice = stoi(inputStrings[MaxPrice]);
+                            dispCt = stoi(inputStrings[DisplayCount]);
+
+                            if (lat < -90 || lat > 90 || lon < -180 || lon > 180 || dispCt > 15) {
+                                if (lat < -90 || lat > 90) {
+                                    errorText.setString("Enter latitude between -90 to 90 degrees!");
+                                } else if (lon < -180 || lon > 180) {
+                                    errorText.setString("Enter longitude between -180 to 180 degrees!");
+                                } else if (dispCt > 15) {
+                                    errorText.setString("Can display maximum of 15 entries");
+                                }
+                            } else { // Run stuff
+                                for (int i = 1; i <= 40; ++i) {
+                                    if (!getListings(listings, maxPrice,
+                                                     "../data/all_data/split_" + to_string(i) + ".json",
+                                                     {lat, lon})) {
+                                        throw runtime_error("Failed to load listings from JSON!\n");
+                                    }
+                                }
+                            }
+                        } else {
+                            errorText.setString("Please enter all fields!");
+                        }
                     }
                     if (methodDropdownButton.getGlobalBounds().contains(mousePos)) {
                         isMethodDropdownOpen = !isMethodDropdownOpen;
@@ -243,10 +280,10 @@ void Window::operator()() {
                                         currentInput += typedChar;
                                     }
                                         // Allow one period if it doesn't already exist
-                                    else if (typedChar == '.' && currentInput.find('.') == std::string::npos) {
+                                    else if (!currentInput.empty() && typedChar == '.' && currentInput.find('.') == std::string::npos) {
                                         currentInput += typedChar;
                                     }
-                                        // Allow digits only
+                                        // Digits only, cap length, cap digits before decimal pt (accounting for - sign)
                                     else if (currentInput.size() < 10 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
                                             (currentInput[0] != '-' && currentInput.size() < 2) || (currentInput[0] == '-') && currentInput.size() < 3)) {
                                         currentInput += typedChar;
@@ -257,10 +294,10 @@ void Window::operator()() {
                                         currentInput += typedChar;
                                     }
                                         // Allow one period if it doesn't already exist
-                                    else if (typedChar == '.' && currentInput.find('.') == std::string::npos) {
+                                    else if (!currentInput.empty() && typedChar == '.' && currentInput.find('.') == std::string::npos) {
                                         currentInput += typedChar;
                                     }
-                                        // Allow digits only
+                                        // Digits only, cap length, cap digits before decimal pt (accounting for - sign)
                                     else if (currentInput.size() < 10 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
                                             (currentInput[0] != '-' && currentInput.size() < 3) || (currentInput[0] == '-') && currentInput.size() < 4)) {
                                         currentInput += typedChar;
@@ -361,9 +398,9 @@ void Window::renderUI() {
 
 
 void Window::resetParameters() {
-    latInput = longInput = "";
-    maxPriceInput = 0;
-    displayCountInput = 0;
+    lat = lon = 0;
+    maxPrice = 0;
+    dispCt = 0;
     methodOption = paramOption = -1; // Reset dropdown options
 
     // Can also clear the output list or reset it here
