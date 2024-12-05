@@ -28,6 +28,12 @@ Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View") {
     errorText.setFillColor(sf::Color::Red);
     errorText.setPosition(WIDTH / 2.0f - 150, HEIGHT - 50);
 
+    sortText.setFont(menuFont);
+    sortText.setString("");
+    sortText.setCharacterSize(18);
+    sortText.setFillColor(sf::Color::White);
+    sortText.setPosition(WIDTH / 2.0f - 150, HEIGHT - 50);
+
     // Input Labels
     latLocation.setFont(menuFont);
     latLocation.setString("Latitude (degrees):");
@@ -81,6 +87,11 @@ Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View") {
     paramDropdownButtonText.setCharacterSize(20);
     paramDropdownButtonText.setFillColor(sf::Color::Black);
     paramDropdownButtonText.setPosition(paramDropdownButton.getPosition().x + 10, paramDropdownButton.getPosition().y + 5);
+
+    scrollBar.setSize(sf::Vector2f(20, 100)); // Width and initial height of the scrollbar
+    scrollBar.setFillColor(sf::Color::White);
+    scrollBar.setPosition(outputList.getPosition().x + outputList.getSize().x - 20, outputList.getPosition().y);
+    scrollOffset = sf::Vector2f(0, 0);
 
     // Dropdown Options
     vector<string> methodOptions = {"Introsort", "Timsort"};
@@ -188,6 +199,7 @@ void Window::operator()() {
                         errorText.setString(""); // Reset error anyway
                     }
                     if (runButton.clicked) {
+                        displayed = false;
                         bool allFilled = true;
                         // Validate input and run simulation
                         for (const auto& [x, y] : inputStrings) {
@@ -213,11 +225,57 @@ void Window::operator()() {
                                     errorText.setString("Can display maximum of 15 entries");
                                 }
                             } else { // Run stuff
+                                vector<Listing> container;
                                 for (int i = 1; i <= 40; ++i) {
-                                    if (!getListings(listings, maxPrice,
+                                    if (!getListings(container, maxPrice,
                                                      "../data/all_data/split_" + to_string(i) + ".json",
                                                      {lat, lon})) {
                                         throw runtime_error("Failed to load listings from JSON!\n");
+                                    }
+                                }
+                                auto distComp = [](const Listing& a, const Listing& b)-> bool {
+                                    return a.distance < b.distance;
+                                };
+                                if (methodOption == 0) {
+                                    // Introsort
+                                    auto start = chrono::high_resolution_clock::now();
+                                    intro::sort(container, listComp(distComp));
+                                    if (paramOption == 1) {
+                                        // Sort top numListings by price
+                                        auto priceComp = [](const Listing &a, const Listing &b) -> bool {
+                                            return a.price < b.price;
+                                        };
+                                        intro::sort(container, 0, min(dispCt, (int)container.size()), listComp(priceComp));
+                                    }
+                                    auto end = chrono::high_resolution_clock::now();
+                                    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+                                    sortText.setString("Sorted through " + to_string(container.size()) +
+                                                        " available listings in " + to_string(duration.count()) + " ms.");
+                                    displayed = true;
+                                } else if (methodOption == 1) {
+                                    auto start = chrono::high_resolution_clock::now();
+                                    tim::sort(container, listComp(distComp));
+                                    if (paramOption == 1) {
+                                        // Sort top numListings by price
+                                        auto priceComp = [](const Listing &a, const Listing &b) -> bool {
+                                            return a.price < b.price;
+                                        };
+                                        vector<Listing> top(container.begin(), container.begin() + min(dispCt, (int)container.size()));
+                                        tim::sort(top, listComp(priceComp));
+                                        auto end = chrono::high_resolution_clock::now();
+                                        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+                                        sortText.setString("Sorted through " + to_string(container.size()) +
+                                                           " available listings in " + to_string(duration.count()) +
+                                                           " ms.");
+                                        displayed = true;
+                                    } else {
+                                        auto end = chrono::high_resolution_clock::now();
+                                        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+                                        sortText.setString("Sorted through " + to_string(container.size()) +
+                                                           " available listings in " + to_string(duration.count()) +
+                                                           " ms.");
+                                        displayed = true;
+                                        listings = container;
                                     }
                                 }
                             }
@@ -320,6 +378,11 @@ void Window::operator()() {
                         activeText.setString(currentInput); // Update displayed text
                     }
                 }
+                if (event.type == sf::Event::MouseWheelScrolled) {
+                    if (displayed) {
+                        handleScroll(event, listings.size());
+                    }
+                }
             }
             // Draw UI
             renderUI();
@@ -338,6 +401,7 @@ void Window::renderUI() {
     runButton.draw(win);
 
     win.draw(errorText);
+    win.draw(sortText);
 
     win.draw(latLocation);
     win.draw(longLocation);
@@ -392,6 +456,9 @@ void Window::renderUI() {
     for (const auto& [type, text] : inputTexts) {
         win.draw(text);
     }
+
+    win.draw(outputList);
+    win.draw(scrollBar); // Draw the scroll bar
     win.display();
 
 }
@@ -409,21 +476,46 @@ void Window::resetParameters() {
         text.setString("");
     }
     errorText.setString(""); // Clear any error messages
+    sortText.setString("");
     paramDropdownButtonText.setString("<Select One>");
     methodDropdownButtonText.setString("<Select One>");
     isParamDropdownOpen = false;
     isMethodDropdownOpen = false;
+    displayed = false;
 
     renderUI(); // Redraw UI
 }
 
+void Window::displayListings(const vector<Listing>& list, int n) {
+    const float padding = 10.0f;
+    float yOffset = outputList.getPosition().y + padding - scrollOffset.y;
+    sf::Font font = menuFont; // Use your existing font
 
-void Window::displayListings() {
-
+    for (size_t i = 0; i < min(n, (int)list.size()); ++i) {
+        if (yOffset > outputList.getPosition().y + outputList.getSize().y) break; // Stop if outside view
+        if (yOffset + 30.0f >= outputList.getPosition().y) { // Render only if visible
+            sf::Text listingText;
+            listingText.setFont(font);
+            listingText.setString(list[i].toString()); // Implement `toString()` in `Listing`
+            listingText.setCharacterSize(14);
+            listingText.setFillColor(sf::Color::White);
+            listingText.setPosition(outputList.getPosition().x + 10, yOffset);
+            win.draw(listingText);
+        }
+        yOffset += 30.0f + padding;
+    }
 }
 
-void Window::fetchAndSortListings() {
-
+void Window::handleScroll(const sf::Event& event, size_t totalListings) {
+    const float maxScrollOffset = max(0.0f, totalListings * 40.0f - outputList.getSize().y); // 40 is the height per listing
+    if (event.type == sf::Event::MouseWheelScrolled) {
+        if (outputList.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(win)))) {
+            scrollOffset.y += -event.mouseWheelScroll.delta * scrollSpeed;
+            scrollOffset.y = max(0.0f, min(scrollOffset.y, maxScrollOffset));
+            scrollBar.setSize(sf::Vector2f(scrollBar.getSize().x, outputList.getSize().y * (outputList.getSize().y / (totalListings * 40.0f))));
+            scrollBar.setPosition(scrollBar.getPosition().x, outputList.getPosition().y + (scrollOffset.y / maxScrollOffset) * (outputList.getSize().y - scrollBar.getSize().y));
+        }
+    }
 }
 
 sf::Text renderText(const string& msg, const sf::Font& font, int size, sf::Color color, bool bold, bool underlined) {

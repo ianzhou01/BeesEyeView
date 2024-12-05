@@ -42,6 +42,7 @@ struct Listing {
     // Defaults to distance comparison (unused currently)
     bool operator<(const Listing& other) const;
     bool operator>(const Listing& other) const;
+    string toString() const;
 };
 
 bool getListings(vector<Listing>& listings, const int maxPrice, const string& fileName, const pair<double, double>& coords);

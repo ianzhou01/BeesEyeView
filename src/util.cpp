@@ -9,6 +9,10 @@ bool Listing::operator>(const Listing &other) const {
     return (this->distance > other.distance);
 }
 
+string Listing::toString() const {
+    return name + " | $" + std::to_string(price) + " | " + std::to_string(distance) + " km";;
+}
+
 bool getListings(vector<Listing>& listings, const int maxPrice,
                  const string& fileName, const pair<double, double>& coords) {
     ifstream file(fileName);

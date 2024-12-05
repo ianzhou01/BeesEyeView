@@ -39,7 +39,11 @@ private:
     Button resetButton, runButton;
     sf::Font menuFont;
     sf::Text titleText;
-    sf::Text errorText;
+    sf::Text errorText, sortText;
+
+    sf::RectangleShape scrollBar; // Visual scroll bar
+    sf::Vector2f scrollOffset;   // Offset for scrolling
+    float scrollSpeed = 20.0f;
 
     sf::Text cursor; // Blinking cursor
     bool cursorVisible = true; // Cursor visibility
@@ -65,14 +69,15 @@ private:
     // State variables for user input and current display
     float lat, lon;
     int maxPrice, dispCt;
+    bool displayed;
 
     vector<Listing> listings; // Listings from JSON parsing
 
     // Helper functions
     void renderUI();
     void resetParameters();
-    void displayListings();
-    void fetchAndSortListings();
+    void displayListings(const vector<Listing>&, int n);
+    void handleScroll(const sf::Event& event, size_t totalListings);
 };
 
 sf::Text renderText(const std::string& msg, const sf::Font& font, int size, sf::Color color, bool bold, bool underlined);
