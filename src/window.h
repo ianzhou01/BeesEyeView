@@ -36,7 +36,7 @@ private:
 
     sf::RenderWindow win;
     sf::RectangleShape menuBar;
-    Button resetButton;
+    Button resetButton, runButton;
     sf::Font menuFont;
     sf::Text titleText;
     sf::Text errorText;

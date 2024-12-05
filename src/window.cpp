@@ -19,6 +19,7 @@ Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View") {
     titleText.setPosition(WIDTH / 2.0f - titleText.getGlobalBounds().width / 2.0f, 10);
 
     resetButton = Button(WIDTH - 120, 10, 100, 40, "Reset", menuFont);
+    runButton = Button(WIDTH - 240, 10, 100, 40, "Run", menuFont);
 
     // Error Text (initially hidden)
     errorText.setFont(menuFont);
@@ -177,11 +178,15 @@ void Window::operator()() {
                     win.close();
                 }
                 resetButton.update(mousePos); // Update button color if pressed
+                runButton.update(mousePos);
 
                 // Mouse click handling
                 if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                     if (resetButton.clicked) {
                         resetParameters(); // Reset application state
+                    }
+                    if (runButton.clicked) {
+
                     }
                     if (methodDropdownButton.getGlobalBounds().contains(mousePos)) {
                         isMethodDropdownOpen = !isMethodDropdownOpen;
@@ -293,6 +298,7 @@ void Window::renderUI() {
     // Draw static elements (title, labels, buttons, etc.)
     win.draw(titleText);
     resetButton.draw(win);
+    runButton.draw(win);
 
     win.draw(errorText);
 
