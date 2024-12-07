@@ -14,11 +14,17 @@
 #include <iomanip>
 #include <chrono> // For timing functions
 
+
 int main(){
     cout << "------------------------------------------------" << endl;
     cout << "     COP3530 Project 3 - Bee's Eye View" << endl;
     cout << " By: Ian Zhou, Phoenix Cushman, Matthew Golden" << endl;
     cout << "------------------------------------------------" << endl;
+
+    vector<string> loadFiles;
+    for (int i=1; i<=40; ++i) {
+        loadFiles.push_back("../data/all_data/split_" + to_string(i) + ".json");
+    }
 
     // TODO:
     //Getting initial location data for distance calculations
@@ -42,20 +48,6 @@ int main(){
         cin.ignore(INT_MAX, '\n');
         cin >> max_price;
         cout << endl;
-    }
-    vector<Listing> listings;
-
-    for (int i=1; i<=40; ++i) {
-        if (!getListings(listings, max_price,
-                         "../data/all_data/split_" + to_string(i) + ".json",
-                         {lat, lon})) {
-            return -1;
-        }
-    }
-
-    if (listings.empty()) {
-        cout << "No listings found. :(\n";
-        return 0;
     }
 
     // Gets sort parameter
@@ -100,6 +92,17 @@ int main(){
         cout << "Enter a valid number!\nHow many entries to display? Enter a number (1 - 100):";
         cin >> numListings;
     }
+    vector<Listing> listings;
+
+    if (!getAllListings(listings, max_price,loadFiles,
+                        {lat, lon})) {
+        return -1;
+    }
+
+    if (listings.empty()) {
+        cout << "No listings found. :(\n";
+        return 0;
+    }
 
     // Sort data
     // Default distance comparator
@@ -119,9 +122,9 @@ int main(){
                 return a.price < b.price;
             };
             // Sort first numListings elements
-            tim::sort(listings, listComp(priceComp));
+            tim::sort(listings, 0, min(numListings, (int)listings.size()),
+                      listComp(priceComp));
         }
-
         //Output time for sorts
         auto end = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);

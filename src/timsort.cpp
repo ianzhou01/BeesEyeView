@@ -1,8 +1,13 @@
 #include "timsort.h"
 
-void tim::sort(vector<Listing>& arr, listComp lessThan){
+void tim::sort(vector<Listing>& arr, listComp lessThan) {
     int RUNSIZE = 32;
-    timsort(arr, arr.size(), RUNSIZE, lessThan);
+    timsort(arr, 0, arr.size()-1, RUNSIZE, lessThan);
+}
+
+void tim::sort(vector<Listing>& arr, int start, int end, listComp lessThan) {
+    int RUNSIZE = 32;
+    timsort(arr, start, end, RUNSIZE, lessThan);
 }
 
 //Basic insertion sort
@@ -22,7 +27,8 @@ void tim::insertionSort(vector<Listing>& arr, int l, int r, listComp lessThan) {
 void tim::merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan) {
     int left_size = m - l + 1;
     int right_size = r - m;
-    Listing left_array[left_size], right_array[right_size];
+    Listing* left_array = new Listing[left_size];
+    Listing* right_array = new Listing[right_size];
 
     //Getting values of left and right arrays
     for (int i = 0; i < left_size; i++) {
@@ -62,20 +68,23 @@ void tim::merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan) {
         merged_index++;
         right_index++;
     }
+    delete[] left_array;
+    delete[] right_array;
 }
 
-//Tim sort
-void tim::timsort(vector<Listing>& arr, int length, int RUNSIZE, listComp lessThan) {
-    //Separates array into RUNSIZE chunks and insertsion sorts each of those chunks
-    for (int i = 0; i < length; i += RUNSIZE) {
-        insertionSort(arr, i, min(i + RUNSIZE - 1, length - 1), lessThan);
+void tim::timsort(vector<Listing> &arr, int start, int end, int RUNSIZE, listComp lessThan) {
+    int length = end - start + 1;
+
+    // Separates array into RUNSIZE chunks and insertion sorts each of those chunks
+    for (int i = start; i <= end; i += RUNSIZE) {
+        insertionSort(arr, i, min(i + RUNSIZE - 1, end), lessThan);
     }
 
-    //Goes through and merges the chunks that were insertion sorted
+    // Goes through and merges the chunks that were insertion sorted
     for (int size = RUNSIZE; size < length; size *= 2) {
-        for (int left = 0; left < length; left += 2 * size) {
-            int middle = left + size - 1;
-            int right = min(left + 2 * size - 1,  length - 1);
+        for (int left = start; left <= end; left += 2 * size) {
+            int middle = min(left + size - 1, end);
+            int right = min(left + 2 * size - 1, end);
             if (middle < right) {
                 merge(arr, left, middle, right, lessThan);
             }
