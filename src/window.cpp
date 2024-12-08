@@ -203,10 +203,20 @@ void Window::operator()() {
                 resetButton.update(mousePos); // Update button color if pressed
                 runButton.update(mousePos);
 
-                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab) {
-                    activeInputBox = getNextInputBox(activeInputBox);
-                    cursorVisible = true;
-                    cursorClock.restart();
+                if (event.type == sf::Event::KeyPressed) {
+                    if (event.key.code == sf::Keyboard::Tab) {
+                        // Tab key skips to next space
+                        activeInputBox = getNextInputBox(activeInputBox);
+                        cursorVisible = true;
+                        cursorClock.restart();
+                    }
+                    if (event.key.code == sf::Keyboard::Enter && activeInputBox != None &&
+                        !inputStrings[activeInputBox].empty() && inputStrings[activeInputBox] != "-") {
+                        // If valid value entered, enter key will go to next space
+                        activeInputBox = getNextInputBox(activeInputBox);
+                        cursorVisible = true;
+                        cursorClock.restart();
+                    }
                 }
 
                 // Mouse click handling
@@ -219,6 +229,7 @@ void Window::operator()() {
                     if (runButton.clicked) {
                         // Run JSON parsing and sorting
                         displayed = false; // No display results yet
+                        listings.clear();
 
                         // Check if filled
                         bool allFilled = true;
@@ -245,47 +256,51 @@ void Window::operator()() {
                                     errorText.setString("Can display maximum of 15 entries");
                                 }
                             } else { // Run stuff
-                                vector<Listing> container;
-                                if (!getAllListings(container, maxPrice,
-                                                 loadFiles,
-                                                 {lat, lon})) {
-                                    throw runtime_error("Failed to load listings from JSON!\n");
-                                }
-                                auto distComp = [](const Listing& a, const Listing& b)-> bool {
-                                    return a.distance < b.distance;
-                                };
-                                if (methodOption == 0) {
-                                    // Introsort
-                                    auto start = chrono::high_resolution_clock::now();
-                                    intro::sort(container, listComp(distComp));
-                                    if (paramOption == 1) {
-                                        // Sort top numListings by price
-                                        auto priceComp = [](const Listing &a, const Listing &b) -> bool {
-                                            return a.price < b.price;
-                                        };
-                                        intro::sort(container, 0, min(dispCt, (int)container.size()), listComp(priceComp));
+                                sortText.setString("Fetching listings...");
+                                renderUI(); // To display fetching in progress message
+                                if (!getAllListings({lat, lon})) {
+                                    errorText.setString("Failed to load listings from JSON!\n");
+                                } else { // Listings loaded. Proceed to sort
+                                    auto distComp = [](const Listing &a, const Listing &b) -> bool {
+                                        return a.distance < b.distance;
+                                    };
+                                    sortText.setString("Sorting...");
+                                    renderUI(); // To display sorting in progress message
+                                    if (methodOption == 0) {
+                                        // Introsort
+                                        auto start = chrono::high_resolution_clock::now();
+                                        intro::sort(listings, listComp(distComp));
+                                        if (paramOption == 1) {
+                                            // Sort top numListings by price
+                                            auto priceComp = [](const Listing &a, const Listing &b) -> bool {
+                                                return a.price < b.price;
+                                            };
+                                            intro::sort(listings, 0, min(dispCt, (int) listings.size()),
+                                                        listComp(priceComp));
+                                        }
+                                        auto end = chrono::high_resolution_clock::now();
+                                        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+                                        sortText.setString("Sorted through " + to_string(listings.size()) +
+                                                           " available listings in " + to_string(duration.count()) +
+                                                           " ms.");
+                                        displayed = true;
+                                    } else if (methodOption == 1) {
+                                        auto start = chrono::high_resolution_clock::now();
+                                        tim::sort(listings, listComp(distComp));
+                                        if (paramOption == 1) {
+                                            // Sort top numListings by price
+                                            auto priceComp = [](const Listing &a, const Listing &b) -> bool {
+                                                return a.price < b.price;
+                                            };
+                                            tim::sort(listings, 0, min(dispCt, (int) listings.size()), listComp(priceComp));
+                                        }
+                                        auto end = chrono::high_resolution_clock::now();
+                                        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+                                        sortText.setString("Sorted through " + to_string(listings.size()) +
+                                                           " available listings in " + to_string(duration.count()) +
+                                                           " ms.");
+                                        displayed = true;
                                     }
-                                    auto end = chrono::high_resolution_clock::now();
-                                    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-                                    sortText.setString("Sorted through " + to_string(container.size()) +
-                                                        " available listings in " + to_string(duration.count()) + " ms.");
-                                    displayed = true;
-                                } else if (methodOption == 1) {
-                                    auto start = chrono::high_resolution_clock::now();
-                                    tim::sort(container, listComp(distComp));
-                                    if (paramOption == 1) {
-                                        // Sort top numListings by price
-                                        auto priceComp = [](const Listing &a, const Listing &b) -> bool {
-                                            return a.price < b.price;
-                                        };
-                                        tim::sort(container, 0, min(dispCt, (int)container.size()), listComp(priceComp));
-                                    }
-                                    auto end = chrono::high_resolution_clock::now();
-                                    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-                                    sortText.setString("Sorted through " + to_string(container.size()) +
-                                                       " available listings in " + to_string(duration.count()) +
-                                                       " ms.");
-                                    displayed = true;
                                 }
                             }
                         } else {
@@ -486,6 +501,7 @@ void Window::resetParameters() {
     maxPrice = 0;
     dispCt = 0;
     methodOption = paramOption = -1; // Reset dropdown options
+    listings.clear();
 
     // Can also clear the output list or reset it here
     for (auto& [type, text] : inputTexts) {
@@ -549,4 +565,106 @@ InputBoxType getNextInputBox(InputBoxType curr) {
     if (curr == DisplayCount || curr == None)
         return Latitude;
     return static_cast<InputBoxType>(curr + 1);
+}
+
+int Window::getAllListings(const pair<double, double>& coords) {
+    int counter = 0;
+    for (const string &fileName : loadFiles) {
+        ifstream file(fileName);
+        if (!file.is_open()) {
+            cerr << "Error opening file: " << fileName << endl;
+            return 0;
+        }
+
+        // Read file into string
+        stringstream buffer;
+        buffer << file.rdbuf();
+        string json = buffer.str();
+        file.close();
+
+        // Parse entire Json file
+        Document doc;
+        doc.Parse(json.c_str());
+
+        // Check if JSON is valid
+        if (doc.HasParseError()) {
+            cerr << "Invalid JSON file!" << endl;
+            return 0;
+        }
+        if (doc.HasMember("results") && doc["results"].IsArray()) {
+            const Value &results = doc["results"];
+            for (SizeType i = 0; i < results.Size(); ++i) {
+                const Value &listing = results[i];
+
+                // Check if listing is available
+                if (listing.HasMember("availability_365") && listing["availability_365"].GetInt() > 0 &&
+                    listing.HasMember("column_10") && listing["column_10"].GetInt() <= maxPrice &&
+                    listing["column_10"].GetInt() != 0) { // Filter out unaffordable, unavailable, and erred listings
+                    Listing available_listing;
+                    available_listing.id = listing["id"].GetInt();
+                    if (listing.HasMember("name") && listing["name"].IsString()) {
+                        available_listing.name = listing["name"].GetString();
+                    } else {
+                        available_listing.name = "N/A"; // Can change
+                    }
+                    available_listing.host_id = listing["host_id"].GetInt();
+                    if (listing.HasMember("neighbourhood") && listing["neighbourhood"].IsString()) {
+                        available_listing.neighbourhood = listing["neighbourhood"].GetString();
+                    } else {
+                        available_listing.neighbourhood = "N/A"; // Can change
+                    }
+                    if (listing.HasMember("room_type") && listing["room_type"].IsString()) {
+                        available_listing.room_type = listing["room_type"].GetString();
+                    } else {
+                        available_listing.room_type = "N/A"; // Can change
+                    }
+                    available_listing.price = listing["column_10"].GetInt();
+                    available_listing.minimum_nights = listing["minimum_nights"].GetInt();
+                    available_listing.num_reviews = listing["number_of_reviews"].GetInt();
+
+                    // These two fields are potentially null
+                    if (listing.HasMember("last_review") && listing["last_review"].IsString()) {
+                        available_listing.last_review_date = listing["last_review"].GetString();
+                    } else {
+                        available_listing.last_review_date = "N/A";
+                    }
+                    if (listing.HasMember("reviews_per_month") && listing["reviews_per_month"].IsString()) {
+                        available_listing.reviews_per_month = listing["reviews_per_month"].GetFloat();
+                    } else {
+                        available_listing.reviews_per_month = nanf(""); // Can change
+                    }
+
+                    available_listing.calculated_host_listings_count = listing["calculated_host_listings_count"].GetInt();
+                    available_listing.availability = listing["availability_365"].GetInt();
+                    if (listing.HasMember("updated_date") && listing["updated_date"].IsString()) {
+                        available_listing.updated_date = listing["updated_date"].GetString();
+                    } else {
+                        available_listing.updated_date = "N/A";
+                    }
+                    if (listing.HasMember("city") && listing["city"].IsString()) {
+                        available_listing.city = listing["city"].GetString();
+                    } else {
+                        available_listing.city = "N/A";
+                    }
+                    if (listing.HasMember("column_19") && listing["column_19"].IsString()) {
+                        available_listing.country = listing["column_19"].GetString();
+                    } else {
+                        available_listing.country = "N/A";
+                    }
+                    available_listing.coord_lon = listing["coordinates"]["lon"].GetDouble();
+                    available_listing.coord_lat = listing["coordinates"]["lat"].GetDouble();
+
+                    available_listing.distance = haversine(coords.first,
+                                                           coords.second,
+                                                           available_listing.coord_lat,
+                                                           available_listing.coord_lon);
+
+                    // Add to the result vector
+                    listings.push_back(available_listing);
+                    ++counter;
+                }
+            }
+        }
+    }
+    return counter;
 }

@@ -82,6 +82,7 @@ private:
     void resetParameters();
     void displayListings(const vector<Listing>&, int n);
     void handleScroll(const sf::Event& event, size_t totalListings);
+    int getAllListings(const pair<double, double>& coords);
 };
 
 InputBoxType getNextInputBox(InputBoxType curr);
