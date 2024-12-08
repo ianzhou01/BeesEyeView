@@ -11,6 +11,11 @@ Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View") {
     if (!menuFont.loadFromFile("../include/FiraSans-Regular.ttf"))
         throw runtime_error("Error loading font from FiraSans-Regular.ttf!\n");
 
+    // Load JSON filenames
+    for (int i=1; i<=40; ++i) {
+        loadFiles.push_back("../data/all_data/split_" + to_string(i) + ".json");
+    }
+
     // Title Text
     titleText.setFont(menuFont);
     titleText.setString("Bee's Eye View");
@@ -136,18 +141,25 @@ Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View") {
     inputBoxLat.setSize(sf::Vector2f(300, 40));
     inputBoxLat.setFillColor(sf::Color(200, 200, 200));
     inputBoxLat.setPosition(350, 100);
+    inputBoxHeights[Latitude] = 100;
+
 
     inputBoxLong.setSize(sf::Vector2f(300, 40));
     inputBoxLong.setFillColor(sf::Color(200, 200, 200));
     inputBoxLong.setPosition(350, 150);
+    inputBoxHeights[Longitude] = 150;
+
 
     inputBoxMaxPrice.setSize(sf::Vector2f(300, 40));
     inputBoxMaxPrice.setFillColor(sf::Color(200, 200, 200));
     inputBoxMaxPrice.setPosition(350, 225);
+    inputBoxHeights[MaxPrice] = 225;
+
 
     inputBoxDisplayCount.setSize(sf::Vector2f(300, 40));
     inputBoxDisplayCount.setFillColor(sf::Color(200, 200, 200));
     inputBoxDisplayCount.setPosition(350, 600);
+    inputBoxHeights[DisplayCount] = 600;
 
     // Listings Display
     outputList.setSize(sf::Vector2f(500, 500));
@@ -191,6 +203,12 @@ void Window::operator()() {
                 resetButton.update(mousePos); // Update button color if pressed
                 runButton.update(mousePos);
 
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab) {
+                    activeInputBox = getNextInputBox(activeInputBox);
+                    cursorVisible = true;
+                    cursorClock.restart();
+                }
+
                 // Mouse click handling
                 if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                     if (resetButton.clicked) {
@@ -199,9 +217,11 @@ void Window::operator()() {
                         errorText.setString(""); // Reset error anyway
                     }
                     if (runButton.clicked) {
-                        displayed = false;
+                        // Run JSON parsing and sorting
+                        displayed = false; // No display results yet
+
+                        // Check if filled
                         bool allFilled = true;
-                        // Validate input and run simulation
                         for (const auto& [x, y] : inputStrings) {
                             if (y.empty() || y == "-") {
                                 allFilled = false;
@@ -226,12 +246,10 @@ void Window::operator()() {
                                 }
                             } else { // Run stuff
                                 vector<Listing> container;
-                                for (int i = 1; i <= 40; ++i) {
-                                    if (!getListings(container, maxPrice,
-                                                     "../data/all_data/split_" + to_string(i) + ".json",
-                                                     {lat, lon})) {
-                                        throw runtime_error("Failed to load listings from JSON!\n");
-                                    }
+                                if (!getAllListings(container, maxPrice,
+                                                 loadFiles,
+                                                 {lat, lon})) {
+                                    throw runtime_error("Failed to load listings from JSON!\n");
                                 }
                                 auto distComp = [](const Listing& a, const Listing& b)-> bool {
                                     return a.distance < b.distance;
@@ -260,23 +278,14 @@ void Window::operator()() {
                                         auto priceComp = [](const Listing &a, const Listing &b) -> bool {
                                             return a.price < b.price;
                                         };
-                                        vector<Listing> top(container.begin(), container.begin() + min(dispCt, (int)container.size()));
-                                        tim::sort(top, listComp(priceComp));
-                                        auto end = chrono::high_resolution_clock::now();
-                                        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-                                        sortText.setString("Sorted through " + to_string(container.size()) +
-                                                           " available listings in " + to_string(duration.count()) +
-                                                           " ms.");
-                                        displayed = true;
-                                    } else {
-                                        auto end = chrono::high_resolution_clock::now();
-                                        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-                                        sortText.setString("Sorted through " + to_string(container.size()) +
-                                                           " available listings in " + to_string(duration.count()) +
-                                                           " ms.");
-                                        displayed = true;
-                                        listings = container;
+                                        tim::sort(container, 0, min(dispCt, (int)container.size()), listComp(priceComp));
                                     }
+                                    auto end = chrono::high_resolution_clock::now();
+                                    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+                                    sortText.setString("Sorted through " + to_string(container.size()) +
+                                                       " available listings in " + to_string(duration.count()) +
+                                                       " ms.");
+                                    displayed = true;
                                 }
                             }
                         } else {
@@ -315,12 +324,20 @@ void Window::operator()() {
                     // Run other input boxes
                     if (inputBoxLat.getGlobalBounds().contains(mousePos)) {
                         activeInputBox = Latitude;
+                        cursorVisible = true;
+                        cursorClock.restart();
                     } else if (inputBoxLong.getGlobalBounds().contains(mousePos)) {
                         activeInputBox = Longitude;
+                        cursorVisible = true;
+                        cursorClock.restart();
                     } else if (inputBoxMaxPrice.getGlobalBounds().contains(mousePos)) {
                         activeInputBox = MaxPrice;
+                        cursorVisible = true;
+                        cursorClock.restart();
                     } else if (inputBoxDisplayCount.getGlobalBounds().contains(mousePos)) {
                         activeInputBox = DisplayCount;
+                        cursorVisible = true;
+                        cursorClock.restart();
                     } else {
                         activeInputBox = None; // Deselect all if clicking elsewhere
                     }
@@ -337,7 +354,7 @@ void Window::operator()() {
                                     if (typedChar == '-' && currentInput.empty()) {
                                         currentInput += typedChar;
                                     }
-                                        // Allow one period if it doesn't already exist
+                                        // Allow one period if it doesn't already exist and field isn't empty
                                     else if (!currentInput.empty() && typedChar == '.' && currentInput.find('.') == std::string::npos) {
                                         currentInput += typedChar;
                                     }
@@ -356,7 +373,7 @@ void Window::operator()() {
                                         currentInput += typedChar;
                                     }
                                         // Digits only, cap length, cap digits before decimal pt (accounting for - sign)
-                                    else if (currentInput.size() < 10 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
+                                    else if (currentInput.size() < 11 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
                                             (currentInput[0] != '-' && currentInput.size() < 3) || (currentInput[0] == '-') && currentInput.size() < 4)) {
                                         currentInput += typedChar;
                                     }
@@ -447,8 +464,8 @@ void Window::renderUI() {
     }
     if (activeInputBox != None) {
         const sf::Text& activeText = inputTexts[activeInputBox];
-        cursor.setPosition(activeText.getGlobalBounds().left + activeText.getGlobalBounds().width + 5,
-                           activeText.getGlobalBounds().top);
+        cursor.setPosition(activeText.getGlobalBounds().left + activeText.getGlobalBounds().width + 1,
+                           inputBoxHeights[activeInputBox] + 6); // Hard-coded for input box. Could add map to store box breadth
         if (cursorVisible) {
             win.draw(cursor); // Only draw the cursor for the active input field
         }
@@ -526,4 +543,10 @@ sf::Text renderText(const string& msg, const sf::Font& font, int size, sf::Color
         text.setStyle(sf::Text::Underlined);
     text.setFillColor(color);
     return text;
+}
+
+InputBoxType getNextInputBox(InputBoxType curr) {
+    if (curr == DisplayCount || curr == None)
+        return Latitude;
+    return static_cast<InputBoxType>(curr + 1);
 }

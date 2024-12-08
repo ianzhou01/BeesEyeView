@@ -23,15 +23,19 @@ const int HEIGHT = 720;
 
 enum InputBoxType { None, Latitude, Longitude, MaxPrice, DisplayCount };
 
+const int inputBoxCt = 4;
+
 class Window {
 public:
     Window();
     void operator()();
 
 private:
+    vector<string> loadFiles;
     InputBoxType activeInputBox = None; // Tracks which input box is active
     unordered_map<InputBoxType, string> inputStrings; // Store all input strings
     unordered_map<InputBoxType, sf::Text> inputTexts;
+    unordered_map<InputBoxType, float> inputBoxHeights;
 
 
     sf::RenderWindow win;
@@ -79,5 +83,7 @@ private:
     void displayListings(const vector<Listing>&, int n);
     void handleScroll(const sf::Event& event, size_t totalListings);
 };
+
+InputBoxType getNextInputBox(InputBoxType curr);
 
 sf::Text renderText(const std::string& msg, const sf::Font& font, int size, sf::Color color, bool bold, bool underlined);
