@@ -16,8 +16,11 @@ class tim {
 public:
     static void sort(vector<Listing>& arr, listComp lessThan);
 
+    static void sort(vector<Listing>& arr, int start, int end, listComp lessThan);
+
+
 private:
-    static void timsort(vector<Listing>& arr, int length, int RUNSIZE, listComp lessThan);
+    static void timsort(vector<Listing>& arr, int start, int end, int RUNSIZE, listComp lessThan);
 
     static void merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan);
 
