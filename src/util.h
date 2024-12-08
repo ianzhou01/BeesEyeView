@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <functional>
 
 // NOTE: check header path
 #include "../include/rapidjson/document.h"
@@ -42,10 +43,9 @@ struct Listing {
     // Defaults to distance comparison (unused currently)
     bool operator<(const Listing& other) const;
     bool operator>(const Listing& other) const;
-    string toString() const;
+    [[nodiscard]] string toString() const;
 };
 
-bool getListings(vector<Listing>& listings, const int maxPrice, const string& fileName, const pair<double, double>& coords);
 
 double toRadians(double degree);
 double haversine(double lat1, double lon1, double lat2, double lon2);
