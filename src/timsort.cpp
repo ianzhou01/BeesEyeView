@@ -27,7 +27,8 @@ void tim::insertionSort(vector<Listing>& arr, int l, int r, listComp lessThan) {
 void tim::merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan) {
     int left_size = m - l + 1;
     int right_size = r - m;
-    Listing left_array[left_size], right_array[right_size];
+    Listing* left_array = new Listing[left_size];
+    Listing* right_array = new Listing[right_size];
 
     //Getting values of left and right arrays
     for (int i = 0; i < left_size; i++) {
@@ -67,6 +68,8 @@ void tim::merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan) {
         merged_index++;
         right_index++;
     }
+    delete[] left_array;
+    delete[] right_array;
 }
 
 //Tim sort
