@@ -7,7 +7,7 @@
 
 #include "window.h"
 
-Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View") {
+Window::Window() : win(sf::VideoMode(WIDTH, HEIGHT), "Bee's Eye View"), fetched(false) {
     if (!menuFont.loadFromFile("../include/FiraSans-Regular.ttf"))
         throw runtime_error("Error loading font from FiraSans-Regular.ttf!\n");
 
@@ -229,7 +229,6 @@ void Window::operator()() {
                     if (runButton.clicked) {
                         // Run JSON parsing and sorting
                         displayed = false; // No display results yet
-                        listings.clear();
 
                         // Check if filled
                         bool allFilled = true;
@@ -242,9 +241,23 @@ void Window::operator()() {
                             allFilled = false;
 
                         if (allFilled) {
-                            lat = stof(inputStrings[Latitude]);
-                            lon = stof(inputStrings[Longitude]);
-                            maxPrice = stoi(inputStrings[MaxPrice]);
+                            if (fetched) { // Read parameters and check if they're different
+                                double newLat = stod(inputStrings[Latitude]);
+                                double newLon = stod(inputStrings[Longitude]);
+                                int newPrice = stoi(inputStrings[MaxPrice]);
+                                if (newLat != lat || newLon != lon || newPrice != maxPrice) {
+                                    listings.clear();
+                                    fetched = false; // Need to recalculate distances or fetch new price range
+                                    lat = newLat;
+                                    lon = newLon;
+                                    maxPrice = newPrice;
+                                }
+                            } else { // First time running
+                                listings.clear(); // If reset, listings will still have old distance values
+                                lat = stod(inputStrings[Latitude]);
+                                lon = stod(inputStrings[Longitude]);
+                                maxPrice = stoi(inputStrings[MaxPrice]);
+                            }
                             dispCt = stoi(inputStrings[DisplayCount]);
 
                             if (lat < -90 || lat > 90 || lon < -180 || lon > 180 || dispCt > 15) {
@@ -256,11 +269,15 @@ void Window::operator()() {
                                     errorText.setString("Can display maximum of 15 entries");
                                 }
                             } else { // Run stuff
-                                sortText.setString("Fetching listings...");
+                                isParamDropdownOpen = isMethodDropdownOpen = false;
+                                sortText.setString("Fetching listings and calculating distances...");
                                 renderUI(); // To display fetching in progress message
-                                if (!getAllListings({lat, lon})) {
+
+                                // Only fetch if first time (false default) or new params (set false above)
+                                if (!fetched && !getAllListings({lat, lon})) {
                                     errorText.setString("Failed to load listings from JSON!\n");
                                 } else { // Listings loaded. Proceed to sort
+                                    fetched = true; // Only need to fetch once
                                     auto distComp = [](const Listing &a, const Listing &b) -> bool {
                                         return a.distance < b.distance;
                                     };
@@ -283,7 +300,6 @@ void Window::operator()() {
                                         sortText.setString("Sorted through " + to_string(listings.size()) +
                                                            " available listings in " + to_string(duration.count()) +
                                                            " ms.");
-                                        displayed = true;
                                     } else if (methodOption == 1) {
                                         auto start = chrono::high_resolution_clock::now();
                                         tim::sort(listings, listComp(distComp));
@@ -299,8 +315,8 @@ void Window::operator()() {
                                         sortText.setString("Sorted through " + to_string(listings.size()) +
                                                            " available listings in " + to_string(duration.count()) +
                                                            " ms.");
-                                        displayed = true;
                                     }
+                                    displayed = true;
                                 }
                             }
                         } else {
@@ -374,7 +390,7 @@ void Window::operator()() {
                                         currentInput += typedChar;
                                     }
                                         // Digits only, cap length, cap digits before decimal pt (accounting for - sign)
-                                    else if (currentInput.size() < 10 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
+                                    else if (currentInput.size() < 15 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
                                             (currentInput[0] != '-' && currentInput.size() < 2) || (currentInput[0] == '-') && currentInput.size() < 3)) {
                                         currentInput += typedChar;
                                     }
@@ -388,7 +404,7 @@ void Window::operator()() {
                                         currentInput += typedChar;
                                     }
                                         // Digits only, cap length, cap digits before decimal pt (accounting for - sign)
-                                    else if (currentInput.size() < 11 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
+                                    else if (currentInput.size() < 16 && isdigit(typedChar) && (currentInput.find('.') != std::string::npos ||
                                             (currentInput[0] != '-' && currentInput.size() < 3) || (currentInput[0] == '-') && currentInput.size() < 4)) {
                                         currentInput += typedChar;
                                     }
@@ -491,17 +507,19 @@ void Window::renderUI() {
 
     win.draw(outputList);
     win.draw(scrollBar); // Draw the scroll bar
+
+    if (displayed)
+        displayListings();
+
     win.display();
-
 }
-
 
 void Window::resetParameters() {
     lat = lon = 0;
     maxPrice = 0;
     dispCt = 0;
     methodOption = paramOption = -1; // Reset dropdown options
-    listings.clear();
+    fetched = false; // Re-fetch when reset
 
     // Can also clear the output list or reset it here
     for (auto& [type, text] : inputTexts) {
@@ -519,23 +537,25 @@ void Window::resetParameters() {
     renderUI(); // Redraw UI
 }
 
-void Window::displayListings(const vector<Listing>& list, int n) {
+void Window::displayListings() {
     const float padding = 10.0f;
     float yOffset = outputList.getPosition().y + padding - scrollOffset.y;
     sf::Font font = menuFont; // Use your existing font
 
-    for (size_t i = 0; i < min(n, (int)list.size()); ++i) {
+    // TODO: Rendering needs touch-ups for scroll display limits
+    for (size_t i = 0; i < min(dispCt, (int)listings.size()); ++i) {
         if (yOffset > outputList.getPosition().y + outputList.getSize().y) break; // Stop if outside view
-        if (yOffset + 30.0f >= outputList.getPosition().y) { // Render only if visible
+        if (yOffset + 5.0f >= outputList.getPosition().y &&
+            yOffset <= outputList.getPosition().y + outputList.getSize().y) { // Render only if visible
             sf::Text listingText;
             listingText.setFont(font);
-            listingText.setString(list[i].toString()); // Implement `toString()` in `Listing`
+            listingText.setString(listings[i].toString()); // Implement `toString()` in `Listing`
             listingText.setCharacterSize(14);
             listingText.setFillColor(sf::Color::White);
             listingText.setPosition(outputList.getPosition().x + 10, yOffset);
             win.draw(listingText);
         }
-        yOffset += 30.0f + padding;
+        yOffset += 100.0f + padding;
     }
 }
 

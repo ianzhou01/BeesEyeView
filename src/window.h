@@ -36,6 +36,7 @@ private:
     unordered_map<InputBoxType, string> inputStrings; // Store all input strings
     unordered_map<InputBoxType, sf::Text> inputTexts;
     unordered_map<InputBoxType, float> inputBoxHeights;
+    bool fetched;
 
 
     sf::RenderWindow win;
@@ -71,7 +72,7 @@ private:
     vector<sf::Text> listingDisplay;
 
     // State variables for user input and current display
-    float lat, lon;
+    double lat, lon;
     int maxPrice, dispCt;
     bool displayed;
 
@@ -80,7 +81,7 @@ private:
     // Helper functions
     void renderUI();
     void resetParameters();
-    void displayListings(const vector<Listing>&, int n);
+    void displayListings();
     void handleScroll(const sf::Event& event, size_t totalListings);
     int getAllListings(const pair<double, double>& coords);
 };
