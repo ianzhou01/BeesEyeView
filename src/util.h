@@ -6,6 +6,7 @@
 #include <vector>
 #include <cmath>
 #include <functional>
+#include <iomanip>
 
 // NOTE: check header path
 #include "../include/rapidjson/document.h"

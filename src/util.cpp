@@ -10,7 +10,19 @@ bool Listing::operator>(const Listing &other) const {
 }
 
 string Listing::toString() const {
-    return name + " | $" + std::to_string(price) + " | " + std::to_string(distance) + " km";;
+    ostringstream oss;
+    oss << fixed << setprecision(3)
+        << "===AVAILABLE===\nRoom type: " << room_type
+        << "\nPrice: $" << price
+        << "\nLocation: " << city << ", " << country
+        << "\nAvailability: " << availability << " days\n";
+
+    if (distance >= 1)
+        oss << distance << " km from you";
+    else
+        oss << distance / 1000 << " m from you";
+
+    return oss.str();
 }
 
 double toRadians(double degree) {
