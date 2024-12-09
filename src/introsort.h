@@ -1,6 +1,6 @@
 /******************************
  * File: introsort.h
- * Purpose: --TODO--
+ * Purpose: Declaration of introsort static methods
  * Authors: Ian Zhou.
  * Created: 11/30/2024
  ******************************/

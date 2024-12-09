@@ -1,3 +1,10 @@
+/******************************
+ * File: introsort.h
+ * Purpose: Definition of introsort static methods
+ * Authors: Ian Zhou.
+ * Created: 11/30/2024
+ ******************************/
+
 #include "introsort.h"
 
 //Main sort to set up depth limit

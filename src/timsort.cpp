@@ -1,8 +1,15 @@
+/******************************
+ * File: timsort.h
+ * Purpose: Definition of timsort static methods
+ * Authors: Matthew Golden, Ian Zhou, Phoenix Cushman.
+ * Created: 11/30/2024
+ ******************************/
+
 #include "timsort.h"
 
-void tim::sort(vector<Listing>& arr, listComp lessThan) {
+void tim::sort(vector<Listing>& arr, listComp lessThan){
     int RUNSIZE = 32;
-    timsort(arr, 0, arr.size()-1, RUNSIZE, lessThan);
+    timsort(arr, 0, arr.size() - 1, RUNSIZE, lessThan);
 }
 
 void tim::sort(vector<Listing>& arr, int start, int end, listComp lessThan) {
@@ -72,6 +79,7 @@ void tim::merge(vector<Listing>& arr, int l, int m, int r, listComp lessThan) {
     delete[] right_array;
 }
 
+//Tim sort
 void tim::timsort(vector<Listing> &arr, int start, int end, int RUNSIZE, listComp lessThan) {
     int length = end - start + 1;
 

@@ -1,3 +1,10 @@
+/******************************
+ * File: util.h
+ * Purpose: This file contains the listing struct and declares utility methods
+ * Authors: Ian Zhou, Phoenix Cushman
+ * Created: 11/30/2024
+ ******************************/
+
 #pragma once
 
 #include <iostream>
@@ -5,6 +12,8 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <functional>
+#include <iomanip>
 
 // NOTE: check header path
 #include "../include/rapidjson/document.h"
@@ -42,9 +51,9 @@ struct Listing {
     // Defaults to distance comparison (unused currently)
     bool operator<(const Listing& other) const;
     bool operator>(const Listing& other) const;
+    [[nodiscard]] string toString() const;
 };
 
-bool getAllListings(vector<Listing>& listings, int maxPrice, const vector<string>& files, const pair<double, double>& coords);
 
 double toRadians(double degree);
 double haversine(double lat1, double lon1, double lat2, double lon2);
