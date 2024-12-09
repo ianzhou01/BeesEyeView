@@ -15,7 +15,7 @@ Button::Button() : originalColor(sf::Color::Blue), darkColor(sf::Color::Green), 
 }
 
 Button::Button(float x, float y, float width, float height, const string &buttonText, const sf::Font &font,
-               sf::Color fillColor, sf::Color textColor) :
+               sf::Color fillColor, sf::Color textColor, int fontSize) :
                originalColor(fillColor),
                darkColor(fillColor.r / 2,fillColor.g / 2,fillColor.b / 2),
                clicked(false)
@@ -27,7 +27,7 @@ Button::Button(float x, float y, float width, float height, const string &button
     text.setFont(font);
     text.setString(buttonText);
     text.setFillColor(textColor);
-    text.setCharacterSize(20); // Default character size
+    text.setCharacterSize(fontSize); // Default character size
 
     centerText();              // Automatically center text within the button
 }

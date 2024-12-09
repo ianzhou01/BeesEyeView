@@ -18,7 +18,7 @@ struct Button {
 
     Button();
     explicit Button(float x, float y, float width, float height, const std::string& buttonText, const sf::Font& font,
-                    sf::Color fillColor = sf::Color::Blue, sf::Color textColor = sf::Color::White);
+                    sf::Color fillColor = sf::Color::Blue, sf::Color textColor = sf::Color::White, int fontSize = 20);
     void draw(sf::RenderWindow &window) const;
 
     // Button state functions
