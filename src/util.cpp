@@ -1,3 +1,10 @@
+/******************************
+ * File: util.cpp
+ * Purpose: This file defines attributes of the listing struct and utility methods
+ * Authors: Ian Zhou, Phoenix Cushman
+ * Created: 11/30/2024
+ ******************************/
+
 #include "util.h"
 
 // Defaults to distance comparison

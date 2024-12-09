@@ -1,6 +1,6 @@
 /******************************
  * File: window.cpp
- * Purpose: This file contains the driver code for the whole program and runs the SFML interface to use the application.
+ * Purpose: This file defines the driver code for the whole program and runs the SFML interface to use the application.
  * Authors: Ian Zhou
  * Created: 12/4/2024
  ******************************/

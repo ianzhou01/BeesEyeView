@@ -1,6 +1,6 @@
 /******************************
  * File: window.h
- * Purpose: This file declares the driver code for the whole program and runs the SFML interface to use the application.
+ * Purpose: This file declares the SFML interface and window functor's methods
  * Authors: Ian Zhou
  * Created: 12/4/2024
  ******************************/

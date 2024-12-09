@@ -1,3 +1,10 @@
+/******************************
+ * File: timsort.h
+ * Purpose: Definition of timsort static methods
+ * Authors: Matthew Golden, Ian Zhou, Phoenix Cushman.
+ * Created: 11/30/2024
+ ******************************/
+
 #include "timsort.h"
 
 void tim::sort(vector<Listing>& arr, listComp lessThan){

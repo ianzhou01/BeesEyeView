@@ -1,3 +1,10 @@
+/******************************
+ * File: button.h
+ * Purpose: This file declares a Button class for SFML interface
+ * Authors: Ian Zhou
+ * Created: 12/4/2024
+ ******************************/
+
 #pragma once
 #include <SFML/Graphics.hpp>
 using namespace std;

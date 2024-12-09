@@ -1,3 +1,10 @@
+/******************************
+ * File: util.h
+ * Purpose: This file contains the listing struct and declares utility methods
+ * Authors: Ian Zhou, Phoenix Cushman
+ * Created: 11/30/2024
+ ******************************/
+
 #pragma once
 
 #include <iostream>

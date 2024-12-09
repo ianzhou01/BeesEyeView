@@ -1,7 +1,7 @@
 /******************************
  * File: timsort.h
- * Purpose: --TODO--
- * Authors: Ian Zhou, Phoenix Cushman, Matthew Golden.
+ * Purpose: Declaration of timsort static methods
+ * Authors: Matthew Golden, Ian Zhou, Phoenix Cushman.
  * Created: 11/30/2024
  ******************************/
 

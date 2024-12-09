@@ -1,6 +1,6 @@
 /******************************
  * File: main.cpp
- * Purpose: This file contains the driver code for the whole program and runs the console interface to use the application.
+ * Purpose: This file contains the driver program that runs the window functor
  * Authors: Ian Zhou, Phoenix Cushman, Matthew Golden.
  * Created: 11/30/2024
  ******************************/

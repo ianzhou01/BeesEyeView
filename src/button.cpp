@@ -1,3 +1,10 @@
+/******************************
+ * File: button.h
+ * Purpose: This file defines the Button class for SFML interface
+ * Authors: Ian Zhou
+ * Created: 12/4/2024
+ ******************************/
+
 #include "button.h"
 
 Button::Button() : originalColor(sf::Color::Blue), darkColor(sf::Color::Green), clicked(false) {
