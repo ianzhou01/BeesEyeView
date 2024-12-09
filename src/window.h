@@ -23,8 +23,6 @@ const int HEIGHT = 720;
 
 enum InputBoxType { None, Latitude, Longitude, MaxPrice, DisplayCount };
 
-const int inputBoxCt = 4;
-
 class Window {
 public:
     Window();
