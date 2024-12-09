@@ -23,8 +23,7 @@ void intro::sort(vector<Listing>& arr, int start, int end,
         end = n - 1;
     // If start invalid or start ahead of end, error found. (If start >= n, then start > (end <= n-1) will execute)
     if (start < 0 || start > end)
-        throw runtime_error("Invalid sorting range! start = \" + to_string(start) +\n"
-                            "                        \", end = \" + to_string(end)");
+        throw runtime_error("Invalid sorting range! (start = " + to_string(start) + ", end = " + to_string(end) + ")");
 
     int depthLimit = 2 * static_cast<int>(log2(n));
     introsort(arr, start, end, depthLimit, lessThan);

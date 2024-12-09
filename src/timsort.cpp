@@ -13,6 +13,14 @@ void tim::sort(vector<Listing>& arr, listComp lessThan){
 }
 
 void tim::sort(vector<Listing>& arr, int start, int end, listComp lessThan) {
+    int n = arr.size();
+    // If "end" is out of range, sort whole array
+    if (end >= n)
+        end = n - 1;
+    // If start invalid or start ahead of end, error found. (If start >= n, then start > (end <= n-1) will execute)
+    if (start < 0 || start > end)
+        throw runtime_error("Invalid sorting range! (start = " + to_string(start) + ", end = " + to_string(end) + ")");
+
     int RUNSIZE = 32;
     timsort(arr, start, end, RUNSIZE, lessThan);
 }
