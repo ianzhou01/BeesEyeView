@@ -252,7 +252,7 @@ void Window::operator()() {
                                     lon = newLon;
                                     maxPrice = newPrice;
                                 }
-                            } else { // First time running
+                            } else { // First time running OR newly resetted
                                 listings.clear(); // If reset, listings will still have old distance values
                                 lat = stod(inputStrings[Latitude]);
                                 lon = stod(inputStrings[Longitude]);
